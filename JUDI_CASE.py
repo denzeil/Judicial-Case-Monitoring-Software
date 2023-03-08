@@ -199,6 +199,4 @@ class Judiciary(tk.Tk):
 
 if __name__ == "__main__":        
     Jud=Judiciary()
-    #frame=ttk_frame
-    #frame=ttk_frame(Jud)
     Jud.mainloop()
