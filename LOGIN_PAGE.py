@@ -32,9 +32,7 @@ class login(tk.Tk):
         self.employee_label=tk.Label(self.main_frame,text='Clerk Log in area',font=('Goudy old style', 23, "bold"),fg='#d77337',bg='White',bd=20,relief='flat',)
         self.employee_label.place(x=95,y=95)
 
-        self.employee_label=tk.Label(self.main_frame,text=' Username',font=('Goudy old style', 23, "bold"),fg='Grey',bg='White',relief='flat',)
-        self.employee_label.place(x=105,y=170)
-        
+      
         self.username_entry = tk.Entry(self.main_frame, highlightthickness=0,textvariable=self.username, relief='flat', bg="lightgrey", fg="#6b6a69",
                                     font=("yu gothic ui ", 12, "bold"), insertbackground = '#6b6a69')
         self.username_entry.place(x=260, y=165, width=270,height=50)
