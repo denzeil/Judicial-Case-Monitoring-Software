@@ -58,6 +58,7 @@ class Judiciary(tk.Tk):
 
         self.title('Judiciary Case Mangement System')
         self.geometry('2000x800+0+0')
+        self.configure(bg="#3A88AA")
         
         self.caseid_string=tk.StringVar()
         self.clientname_string=tk.StringVar()
@@ -66,16 +67,14 @@ class Judiciary(tk.Tk):
         self.lawyercontact_string=tk.StringVar()
         self.casetype_string=tk.StringVar()
         self.datefiled_string=tk.StringVar()
-        
         self.appearances_string=tk.StringVar()
         self.billing_string=tk.StringVar()
-       
         self.judgeemail_string=tk.StringVar()
         self.hearingdate_string=tk.StringVar()
         self.nexthearing_string=tk.StringVar()
         self.judgecontact_string=tk.StringVar()
        
-        self.label1=tk.Label(self,bd=20,relief="ridge",text="SUBORDINATE'S CASE MANAGEMENT SYSTEM",fg="green",bg="white",font=("times new roman bold",40))
+        self.label1=tk.Label(self,bd=20,relief="ridge",text="SUBORDINATE'S CASE MANAGEMENT SYSTEM",fg="blue",bg="white",font=("times new roman bold",40))
         self.label1.pack(side="top",fill="x")
     
         #Create 
