@@ -18,6 +18,7 @@ class ttk_frame(ttk.Frame):
         self.combobox['value']=('Active','pending')
         self.combobox.current(0)
         self.combobox.grid(row=7, column=1)
+       
 
     def judge(self,container):
         self.judgename_string=tk.StringVar()
