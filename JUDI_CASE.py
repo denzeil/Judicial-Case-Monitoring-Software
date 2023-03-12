@@ -74,8 +74,9 @@ class Judiciary(tk.Tk):
         self.hearingdate_string=tk.StringVar()
         self.nexthearing_string=tk.StringVar()
         self.judgecontact_string=tk.StringVar()
+        self.judge_stringid=tk.StringVar()
        
-        self.label1=tk.Label(self,bd=20,relief="ridge",text="SUBORDINATE'S CASE MANAGEMENT SYSTEM",fg="blue",bg="white",font=("times new roman bold",40))
+        self.label1=tk.Label(self,bd=20,relief="ridge",text="JUDICIARY CASE MANAGEMENT SYSTEM",fg="blue",bg="white",font=("times new roman bold",40))
         self.label1.pack(side="top",fill="x")
     
         #Create 
@@ -162,17 +163,22 @@ class Judiciary(tk.Tk):
         self.j_contactentry=tk.Entry(self.DataFrameLeft,textvariable=self.judgecontact_string ,font=('arial bold',12),width=35)
         self.j_contactentry.grid(row=2,column=3)
 
+        self.judge_id=tk.Label(self.DataFrameLeft,text="Judge ID",font=('arial bold',12),padx=2,pady=6)
+        self.judge_id.grid(row=3,column=2,sticky='W')
+        self.judgeid_entry=tk.Entry(self.DataFrameLeft,textvariable=self.judge_stringid ,font=('arial bold',12),width=35)
+        self.judgeid_entry.grid(row=3,column=3)
+
          
         self.hearing_date=tk.Label(self.DataFrameLeft,text="Hearing Date",font=('arial bold',12),padx=2,pady=6)
-        self.hearing_date.grid(row=3,column=2,sticky='W')
+        self.hearing_date.grid(row=4,column=2,sticky='W')
         self.hearingentry=tk.Entry(self.DataFrameLeft,textvariable=self.hearingdate_string ,font=('arial bold',12),width=35)
-        self.hearingentry.grid(row=3,column=3)
+        self.hearingentry.grid(row=4,column=3)
 
          
         self.next_hearing=tk.Label(self.DataFrameLeft,text="Next hearing",font=('arial bold',12),padx=2,pady=6)
-        self.next_hearing.grid(row=4,column=2,sticky='W')
+        self.next_hearing.grid(row=5,column=2,sticky='W')
         self.next_hearingentry=tk.Entry(self.DataFrameLeft,textvariable=self.nexthearing_string ,font=('arial bold',12),width=35)
-        self.next_hearingentry.grid(row=4,column=3)
+        self.next_hearingentry.grid(row=5,column=3)
          
         #Dataframe right
         self.txtprescription=tk.Text(self.DataFrameRight,font=('arial bold',12),fg='white',bg='#3A88AA',padx=2,pady=6,width=45,height=16)
