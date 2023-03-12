@@ -15,6 +15,27 @@ class ttk_window(ttk.Frame):
              self.combobox['value']=('Clerk','Judge')
              self.combobox.current(0)
              self.combobox.grid(row=3, column=1)
+    def tree_view(self,container):
+               self.scroll_x=ttk.Scrollbar(container,orient='horizontal')
+               self.scroll_y=ttk.Scrollbar(container,orient='vertical')
+               column_one=('First Name','Second Name','Work ID','User Type','Email','Contact','Username')
+               self.case_table=ttk.Treeview(container,columns=column_one,xscrollcommand=self.scroll_y.set,yscrollcommand=self.scroll_y.set)
+
+               self.scroll_x.pack(side='bottom',fill='x')
+               self.scroll_y.pack(side='right',fill='y')
+
+
+               self.scroll_x=ttk.Scrollbar(command=self.case_table.xview)
+               self.scroll_y=ttk.Scrollbar(command=self.case_table.yview)
+               column_two=('First Name','Second Name','Work ID','User Type','Email','Contact','Username')
+
+               for x,y in zip(column_one,column_two):
+                 self.case_table.heading(x,text=y)
+               for x in column_one:
+                 self.case_table.column(x,width=100)
+
+               self.case_table['show']='headings'
+               self.case_table.pack(fill='both',expand=1)    
         
 
 class Admin_Panel(tk.Tk):
@@ -34,6 +55,7 @@ class Admin_Panel(tk.Tk):
         self.contact_string=tk.StringVar()
         self.password_string=tk.StringVar()
         self.repeat_string=tk.StringVar()
+        self.username_string=tk.StringVar()
 
 
         #===========Frames======================#
@@ -76,15 +98,10 @@ class Admin_Panel(tk.Tk):
         
         self.work_id=tk.Label(self.main_frame,text='Work ID',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat',)
         self.work_id.grid(row=2,column=0,sticky='W',pady=7)
-        self.workid_entry = tk.Entry(self.main_frame, highlightthickness=0, relief='flat', bg="lightgrey", fg="#6b6a69",
+        self.workid_entry = tk.Entry(self.main_frame, highlightthickness=0,textvariable=self.work, relief='flat', bg="lightgrey", fg="#6b6a69",
                                     font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
         self.workid_entry.grid(row=2,column=1,pady=7)
         
-        self.work_id=tk.Label(self.main_frame,text='Work ID',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat',)
-        self.work_id.grid(row=2,column=0,sticky='W',pady=7)
-        self.workid_entry = tk.Entry(self.main_frame, highlightthickness=0, relief='flat', bg="lightgrey", fg="#6b6a69",
-                                    font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
-        self.workid_entry.grid(row=2,column=1,pady=7)
 
         self.user_type=tk.Label(self.main_frame,text='User Type',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat',)
         self.user_type.grid(row=3,column=0,sticky='W',pady=7)
@@ -115,6 +132,13 @@ class Admin_Panel(tk.Tk):
         self.repeat_entry= tk.Entry(self.main_frame, highlightthickness=0, relief='flat',textvariable=self.repeat_string, bg="lightgrey", fg="#6b6a69",
                                     font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
         self.repeat_entry.grid(row=8,column=1,pady=7)
+        
+
+        self.username=tk.Label(self.main_frame,text='Username',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat',)
+        self.username.grid(row=0,column=3,sticky='W',pady=7)
+        self.username_entry= tk.Entry(self.main_frame, highlightthickness=0, relief='flat',textvariable=self.username_string, bg="lightgrey", fg="#6b6a69",
+                                    font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
+        self.username_entry.grid(row=0,column=4,pady=7)
         #=============================================================================================#
         #=======================Buttons===============================================================#
 
@@ -133,6 +157,10 @@ class Admin_Panel(tk.Tk):
         
         self.exit_button=tk.Button(self.button_frame,text='Exit',bg='#d77337',fg='white',font=('Goudy old style',18))
         self.exit_button.place(x=2,y=350,width=163)
+
+        #=================Display frame================#
+        my_user.tree_view(self.display_frame)
+
        
 
        
