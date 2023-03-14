@@ -5,23 +5,24 @@ import random
 import time 
 import datetime
 from tkinter import messagebox
-import _mysql_connector
+import mysql.connector
 
 class ttk_frame(ttk.Frame):
     def __init__(self,container):
         super().__init__(container)
-        
+
+        self.casestatus_string = tk.StringVar()
+        self.judgename_string = tk.StringVar()
     
     def combo_box(self, container):
-        self.casestatus_string=tk.StringVar()
+        
         self.combobox=ttk.Combobox(container,textvariable=self.casestatus_string, font=('arial bold',12), width=33)
         self.combobox['value']=('Active','pending')
         self.combobox.current(0)
         self.combobox.grid(row=7, column=1)
-       
-
+    
     def judge(self,container):
-        self.judgename_string=tk.StringVar()
+        
         self.combo_j=ttk.Combobox(container,textvariable=self.judgename_string, font=('arial bold',12), width=33)
         self.combo_j['value']=('Justice George Njenga','Justice Jane Kuria')
         self.combo_j.current(0)
@@ -75,8 +76,9 @@ class Judiciary(tk.Tk):
         self.nexthearing_string=tk.StringVar()
         self.judgecontact_string=tk.StringVar()
         self.judge_stringid=tk.StringVar()
+        self.search_string=tk.StringVar()
        
-        self.label1=tk.Label(self,bd=20,relief="ridge",text="JUDICIARY CASE MANAGEMENT SYSTEM",fg="blue",bg="white",font=("times new roman bold",40))
+        self.label1=tk.Label(self,bd=13,relief="ridge",text="JUDICIARY CASE MANAGEMENT SYSTEM",fg="blue",bg="white",font=("times new roman bold",38))
         self.label1.pack(side="top",fill="x")
     
         #Create 
@@ -97,9 +99,18 @@ class Judiciary(tk.Tk):
         #DetailsFrame
         self.DetailsFrame=tk.Frame(self,bd=10,relief='ridge')
         self.DetailsFrame.place(x=0,y=600,width=1530,height=140)
+        
+        #search frame
+        self.search_frame=tk.Frame(self,bd=6,relief='ridge',bg="white")
+        self.search_frame.place(x=1015,y=79,width=347,height=52)
+
+        self.search_button=tk.Button(self.search_frame,text='Search',bg='#B4123D',fg='white',font=('arial bold',12))
+        self.search_button.place(x=0,y=0,width=148,height=40)
+        self.search_entry=tk.Entry(self.search_frame,textvariable=self.search_string,bg="lightgrey",font=('arial bold',12))
+        self.search_entry.place(x=150,y=0,width=190,height=40)
 
         #Left Dataframe details
-        self.case_Id=tk.Label(self.DataFrameLeft,text='Case ID',font=('arial bold',12),padx=2,pady=6)
+        self.case_Id=tk.Label(self.DataFrameLeft,text='Case ID',font=('arial bold',12),padx=2,pady=6 )
         self.case_Id.grid(row=0,column=0,sticky='W')
         self.caseEntry=tk.Entry(self.DataFrameLeft,textvariable=self.caseid_string,font=('arial bold',12),width=35)
         self.caseEntry.grid(row=0,column=1)
@@ -116,7 +127,7 @@ class Judiciary(tk.Tk):
 
         self.lawyer_name=tk.Label(self.DataFrameLeft,text="Lawyer's Name.",font=('arial bold',12),padx=2,pady=6)
         self.lawyer_name.grid(row=3,column=0,sticky='W')
-        self.lawyer_entry=tk.Entry(self.DataFrameLeft,textvariable=self.lawyercontact_string,font=('arial bold',12),width=35)
+        self.lawyer_entry=tk.Entry(self.DataFrameLeft,textvariable=self.lawyername_string,font=('arial bold',12),width=35)
         self.lawyer_entry.grid(row=3,column=1)
 
         self.lawyer_contact=tk.Label(self.DataFrameLeft,text="Lawyer's Contact",font=('arial bold',12),padx=2,pady=6)
@@ -136,8 +147,8 @@ class Judiciary(tk.Tk):
 
         self.case_status=tk.Label(self.DataFrameLeft,text="Case Status",font=('arial bold',12),padx=2,pady=6)
         self.case_status.grid(row=7,column=0,sticky='W')
-        my_object = ttk_frame(self)  # create an instance of ttk_frame
-        my_object.combo_box(self.DataFrameLeft) # add combobox to DataFrameLeft container
+        self.my_object = ttk_frame(self) # create an instance of ttk_frame
+        self.my_object.combo_box(self.DataFrameLeft) # add combobox to DataFrameLeft container
 
         self.appearance=tk.Label(self.DataFrameLeft,text='Court Appearances',font=('arial bold',12),padx=2,pady=6)
         self.appearance.grid(row=8,column=0,sticky='W')
@@ -151,7 +162,7 @@ class Judiciary(tk.Tk):
 
         self.judge_name=tk.Label(self.DataFrameLeft,text="Judge's Name",font=('arial bold',12),padx=2,pady=6)
         self.judge_name.grid(row=0,column=2,sticky='W')
-        my_object.judge(self.DataFrameLeft)
+        self.my_object.judge(self.DataFrameLeft)
 
         self.judge_email=tk.Label(self.DataFrameLeft,text="Judge's Email",font=('arial bold',12),padx=2,pady=6)
         self.judge_email.grid(row=1,column=2,sticky='W')
@@ -181,10 +192,10 @@ class Judiciary(tk.Tk):
         self.next_hearingentry.grid(row=5,column=3)
          
         #Dataframe right
-        self.txtprescription=tk.Text(self.DataFrameRight,font=('arial bold',12),fg='white',bg='#3A88AA',padx=2,pady=6,width=45,height=16)
+        self.txtprescription=tk.Text(self.DataFrameRight,font=('arial bold',12),fg='white',bg='#3A88AA',padx=2,pady=6,width=36,height=17)
         self.txtprescription.grid(row=0,column=0)
  
-        self.Showdetails=tk.Button(self.ButtonFrame,text='Details',bg='#B4123D',fg='white',width=26,pady=6,padx=2,font=('arial bold',12))
+        self.Showdetails=tk.Button(self.ButtonFrame,text='Submit Details',command=self.submit, bg='#B4123D',fg='white',width=26,pady=6,padx=2,font=('arial bold',12))
         self.Showdetails.grid(row=0,column=1,ipady=1)
 
         self.case_detailsbutton=tk.Button(self.ButtonFrame,text='Case Details',bg='#B4123D',fg='white',width=26,pady=6,padx=2,font=('arial bold',12))
@@ -200,9 +211,55 @@ class Judiciary(tk.Tk):
         self.exit_button.grid(row=0,column=5,ipady=1)
 
         # ==================================Scrollbar========================
-        my_object.scrollbar(self.DetailsFrame)
+        self.my_object.scrollbar(self.DetailsFrame)
+
+        #==================Functionalities=================================
+    def submit(self):
+            if self.caseid_string.get()== " " or self.appearances_string == " ":
+                messagebox.showerror('Error','All fields are required')
+            else:
+                #establish a connection
+                    db=mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="1caleb2denzeil",
+                    database="Judiciary"
+                     )    
+                #create a cursor
+                    cursor=db.cursor()
+            
+                    try:
+                        casestatus=self.my_object.casestatus_string.get()
+                        judgename=self.my_object.judgename_string.get()
+                        
+                        judge_tables="INSERT INTO judge_information(Judge_ID,Judge_name,Judge_email,Judge_contact) VALUES (%s,%s,%s,%s)"
+                        judge_values=(self.judge_stringid.get(),judgename,self.judgeemail_string.get(),self.judgecontact_string.get())
+                        cursor.execute(judge_tables,judge_values)
+
+
+                        sql_tables="INSERT INTO client_information(Case_ID,Client_name,Client_Contact,Case_type,Case_status, Appearances, Billing_ksh, Judge_ID, Hearing_date, Next_hearing, Laywer_name, Laywer_contact,Date_filed) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                        client_values=(self.caseid_string.get(),self.clientname_string.get(),self.clientcontact_string.get(),self.casetype_string.get(), casestatus ,self.appearances_string.get(),self.billing_string.get()
+                                      ,self.judge_stringid.get(),self.hearingdate_string.get(),self.nexthearing_string.get() ,
+                                      self.lawyername_string.get(), self.lawyercontact_string.get(),self.datefiled_string.get())
+                        cursor.execute(sql_tables,client_values)
+                        
+                        #Insert into judge information
+                       
+                        db.commit()
+                        messagebox.showinfo("Success","Case Details inserted successfully")
+                        
+                    
+                    except mysql.connector.Error as error:
+                        messagebox.showerror("Error",str(error))
+
+                           
+                    finally:
+                        cursor.close()
+                        db.close()
         
+
 
 if __name__ == "__main__":        
     Jud=Judiciary()
+    ttk_frame(Jud)
     Jud.mainloop()
