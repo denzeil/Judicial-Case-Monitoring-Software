@@ -11,9 +11,11 @@ from tkinter import END
 class ttk_frame(ttk.Frame):
     def __init__(self,container):
         super().__init__(container)
+        
 
         self.casestatus_string = tk.StringVar()
         self.judgename_string = tk.StringVar()
+        self.case_table=None
     
     def combo_box(self, container):
         
@@ -29,7 +31,7 @@ class ttk_frame(ttk.Frame):
         self.combo_j.current(0)
         self.combo_j.grid(row=0, column=3)
     
-    def scrollbar(self,container):
+    def scrollbar(self,container,function2):
        
         column_one = ('Case_ID', 'Client_name', 'Lawyer_name', 'Judge', 'Case_Type', 'Date_filed', 'Appearances', 'Billing_info', 'Hearing_date', 'Next_hearing')
         column_two = ('Case ID', 'Client Name', 'Judge', 'Case Type', 'Date filed', 'Appearances', 'Billing info', 'Hearing date', 'Next Hearing')
@@ -49,6 +51,7 @@ class ttk_frame(ttk.Frame):
 
         self.case_table['show'] = 'headings'
         self.case_table.pack(fill='both', expand=1)
+        self.case_table.bind("<ButtonRelease-1>",function2)
         self.fetch_data()
     
     def fetch_data(self):
@@ -68,7 +71,8 @@ class ttk_frame(ttk.Frame):
             for i in rows:
                 case_table.insert("", END, values=i)
             db.commit()
-        db.close()     
+        db.close()   
+
 #Create the class
 class Judiciary(tk.Tk):
     def __init__(self):
@@ -120,7 +124,7 @@ class Judiciary(tk.Tk):
         self.search_frame=tk.Frame(self,bd=6,relief='ridge',bg="white")
         self.search_frame.place(x=1015,y=79,width=347,height=52)
 
-        self.search_button=tk.Button(self.search_frame,text='Search',bg='#B4123D',fg='white',font=('arial bold',12))
+        self.search_button=tk.Button(self.search_frame,command=self.search_query,text='Search',bg='#B4123D',fg='white',font=('arial bold',12))
         self.search_button.place(x=0,y=0,width=148,height=40)
         self.search_entry=tk.Entry(self.search_frame,textvariable=self.search_string,bg="lightgrey",font=('arial bold',12))
         self.search_entry.place(x=150,y=0,width=190,height=40)
@@ -231,7 +235,7 @@ class Judiciary(tk.Tk):
         self.exit_button.grid(row=0,column=6,ipady=1)
 
         # ==================================Scrollbar========================
-        self.my_object.scrollbar(self.DetailsFrame)
+        self.my_object.scrollbar(self.DetailsFrame,self.get_treedetails)
 
         #==================Functionalities=================================
     def submit(self):
@@ -278,7 +282,65 @@ class Judiciary(tk.Tk):
                         self.my_object.fetch_data()
                         db.close()
         
+    def get_treedetails(self,event=""):
+        tree_row = self.my_object.case_table.focus()
+        content = self.my_object.case_table.item(tree_row)
+        self.judgename = self.my_object.judgename_string
+        row=content['values']
+        self.caseid_string.set(row[0])
+        self.clientname_string.set(row[1])
+        self.judgename.set(row[2])
+        self.casetype_string.set(row[3])
+        self.datefiled_string.set(row[4])
+        self.appearances_string.set(row[5])
+        self.billing_string.set(row[6])
+        self.hearingdate_string.set(row[7])
+        self.nexthearing_string.set(row[8])
 
+    def search_query(self):
+              db=mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="1caleb2denzeil",
+                    database="Judiciary"
+                     ) 
+              try:
+                 mycursor=db.cursor() 
+                 search=self.search_string.get()
+                 query="SELECT client_information.Case_ID, client_information.Client_name, client_information.Client_contact, client_information.Case_type, client_information.Case_status, client_information.Appearances, client_information.Billing_ksh, judge_information.Judge_ID, client_information.Hearing_date, client_information.Next_hearing, client_information.Laywer_name, client_information.Laywer_contact, client_information.Date_filed, judge_information.Judge_name, judge_information.Judge_email, judge_information.Judge_contact FROM client_information INNER JOIN judge_information ON client_information.Judge_ID = judge_information.Judge_ID WHERE client_information.Case_ID= %s"
+                 mycursor.execute(query,(search,))
+                 result=mycursor.fetchone()
+
+                 if result is None:
+                    messagebox.showinfo("No Results", "No information found for the given search query.")
+                 else:
+                    casestatus=self.my_object.casestatus_string
+                    judgename=self.my_object.judgename_string
+                    self.caseid_string.set(result[0])
+                    self.clientname_string.set(result[1])
+                    self.clientcontact_string.set(result[2])
+                    self.casetype_string.set(result[3])
+                    casestatus.set(result[4])
+                    self.appearances_string.set(result[5])
+                    self.billing_string.set(result[6])
+                    self.judge_stringid.set(result[7]) 
+                    self.hearingdate_string.set(result[8])
+                    self.nexthearing_string.set(result[9])
+                    self.lawyername_string.set(result[10])
+                    self.lawyercontact_string.set(result[11])
+                    self.datefiled_string.set(result[12])
+                    judgename.set(result[13])
+                    self.judgeemail_string.set(result[14])
+                    self.judgecontact_string.set(result[15])
+                  
+              except mysql.connector.Error as error:
+                        messagebox.showerror("Error",str(error))
+
+                           
+              finally:
+                        mycursor.close()
+                     
+                        db.close()
 
 if __name__ == "__main__":        
     Jud=Judiciary()
