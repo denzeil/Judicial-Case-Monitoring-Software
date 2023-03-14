@@ -6,6 +6,7 @@ import time
 import datetime
 from tkinter import messagebox
 import mysql.connector
+from tkinter import END
 
 class ttk_frame(ttk.Frame):
     def __init__(self,container):
@@ -29,30 +30,45 @@ class ttk_frame(ttk.Frame):
         self.combo_j.grid(row=0, column=3)
     
     def scrollbar(self,container):
-        self.scroll_x=ttk.Scrollbar(container,orient='horizontal')
-        self.scroll_y=ttk.Scrollbar(container,orient='vertical')
-        column_one=('Case_ID','Client_name','Lawyer_name','Judge','Case_Type','Date_filed','Appearances','Billing_info',
-                            'Hearing_date','Next_hearing')
-        self.case_table=ttk.Treeview(container,columns=column_one,xscrollcommand=self.scroll_y.set,yscrollcommand=self.scroll_y.set)
+       
+        column_one = ('Case_ID', 'Client_name', 'Lawyer_name', 'Judge', 'Case_Type', 'Date_filed', 'Appearances', 'Billing_info', 'Hearing_date', 'Next_hearing')
+        column_two = ('Case ID', 'Client Name', 'Judge', 'Case Type', 'Date filed', 'Appearances', 'Billing info', 'Hearing date', 'Next Hearing')
+        self.case_table = ttk.Treeview(container, columns=column_one)
 
-        self.scroll_x.pack(side='bottom',fill='x')
-        self.scroll_y.pack(side='right',fill='y')
+        self.scroll_y = ttk.Scrollbar(container, orient='vertical',command=self.case_table.yview)
+        self.case_table.configure(yscroll=self.scroll_y.set)      
+        self.scroll_y.pack(side='right', fill='y')
 
-
-        self.scroll_x=ttk.Scrollbar(command=self.case_table.xview)
-        self.scroll_y=ttk.Scrollbar(command=self.case_table.yview)
-        column_two=('Case ID','Client Name','Judge','Case Type','Date filed','Appearances','Billing info','Hearing date',
-                  'Next Hearing')
-
-        for x,y in zip(column_one,column_two):
-            self.case_table.heading(x,text=y)
-        for x in column_one:
-            self.case_table.column(x,width=100)
-
-        self.case_table['show']='headings'
-        self.case_table.pack(fill='both',expand=1)    
+        self.scroll_x = ttk.Scrollbar(container, orient='horizontal',command=self.case_table.xview)
+        self.case_table.configure(xscroll=self.scroll_x.set)
+        self.scroll_x.pack(side='bottom', fill='x') 
         
-         
+        for x, y in zip(column_one, column_two):
+            self.case_table.heading(x, text=y)
+            self.case_table.column(x, width=100)
+
+        self.case_table['show'] = 'headings'
+        self.case_table.pack(fill='both', expand=1)
+        self.fetch_data()
+    
+    def fetch_data(self):
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="1caleb2denzeil",
+            database="Judiciary"
+        )
+        my_cursor = db.cursor()
+        sql_query = "SELECT client_information.Case_ID, client_information.Client_name, judge_information.Judge_name AS Judge, client_information.Case_type, client_information.Date_filed, client_information.Appearances, client_information.Billing_ksh AS Billing_info, client_information.Hearing_date, client_information.Next_hearing FROM client_information JOIN judge_information ON client_information.Judge_ID = judge_information.Judge_ID "
+        my_cursor.execute(sql_query)
+        rows = my_cursor.fetchall()
+        if len(rows) != 0:
+            case_table = self.case_table
+            case_table.delete(*case_table.get_children())
+            for i in rows:
+                case_table.insert("", END, values=i)
+            db.commit()
+        db.close()     
 #Create the class
 class Judiciary(tk.Tk):
     def __init__(self):
@@ -195,20 +211,24 @@ class Judiciary(tk.Tk):
         self.txtprescription=tk.Text(self.DataFrameRight,font=('arial bold',12),fg='white',bg='#3A88AA',padx=2,pady=6,width=36,height=17)
         self.txtprescription.grid(row=0,column=0)
  
-        self.Showdetails=tk.Button(self.ButtonFrame,text='Submit Details',command=self.submit, bg='#B4123D',fg='white',width=26,pady=6,padx=2,font=('arial bold',12))
+        self.Showdetails=tk.Button(self.ButtonFrame,text='Submit Details',command=self.submit, bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.Showdetails.grid(row=0,column=1,ipady=1)
 
-        self.case_detailsbutton=tk.Button(self.ButtonFrame,text='Case Details',bg='#B4123D',fg='white',width=26,pady=6,padx=2,font=('arial bold',12))
+        self.case_detailsbutton=tk.Button(self.ButtonFrame,text='Case Details',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.case_detailsbutton.grid(row=0,column=2,ipady=1)
         
-        self.update_button=tk.Button(self.ButtonFrame,text='Update',bg='#B4123D',fg='white',width=26,pady=6,padx=2,font=('arial bold',12))
+        self.update_button=tk.Button(self.ButtonFrame,text='Update',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.update_button.grid(row=0,column=3,ipady=1)
         
-        self.delete_button=tk.Button(self.ButtonFrame,text='Delete',bg='#B4123D',fg='white',width=26,pady=6,padx=2,font=('arial bold',12))
+        self.delete_button=tk.Button(self.ButtonFrame,text='Delete',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.delete_button.grid(row=0,column=4,ipady=1)
+
+        self.clear_button=tk.Button(self.ButtonFrame,text='Clear',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
+        self.clear_button.grid(row=0,column=5,ipady=1)
         
-        self.exit_button=tk.Button(self.ButtonFrame,text='Exit',bg='#B4123D',fg='white',width=26,pady=6,padx=2,font=('arial bold',12))
-        self.exit_button.grid(row=0,column=5,ipady=1)
+        
+        self.exit_button=tk.Button(self.ButtonFrame,text='Exit',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
+        self.exit_button.grid(row=0,column=6,ipady=1)
 
         # ==================================Scrollbar========================
         self.my_object.scrollbar(self.DetailsFrame)
@@ -231,7 +251,7 @@ class Judiciary(tk.Tk):
                     try:
                         casestatus=self.my_object.casestatus_string.get()
                         judgename=self.my_object.judgename_string.get()
-                        
+
                         judge_tables="INSERT INTO judge_information(Judge_ID,Judge_name,Judge_email,Judge_contact) VALUES (%s,%s,%s,%s)"
                         judge_values=(self.judge_stringid.get(),judgename,self.judgeemail_string.get(),self.judgecontact_string.get())
                         cursor.execute(judge_tables,judge_values)
@@ -255,6 +275,7 @@ class Judiciary(tk.Tk):
                            
                     finally:
                         cursor.close()
+                        self.my_object.fetch_data()
                         db.close()
         
 
