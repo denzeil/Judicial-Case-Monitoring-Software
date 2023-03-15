@@ -2,40 +2,61 @@ import tkinter as tk
 from tkinter import ttk 
 from PIL import ImageTk,Image
 from tkinter import messagebox
-import _mysql_connector
-
+import mysql.connector
+from tkinter import END
 
 class ttk_window(ttk.Frame):
     def __init__(self,container):
         super().__init__(container)
-        
+        self.usertype=tk.StringVar() 
     def combo_type(self,container):
-             self.user_type=tk.StringVar()
-             self.combobox=ttk.Combobox(container,textvariable=self.user_type, font=('yu gothic ui', 16, "bold"))
-             self.combobox['value']=('Clerk','Judge')
-             self.combobox.current(0)
-             self.combobox.grid(row=3, column=1)
-    def tree_view(self,container):
-               self.scroll_x=ttk.Scrollbar(container,orient='horizontal')
-               self.scroll_y=ttk.Scrollbar(container,orient='vertical')
-               column_one=('First Name','Second Name','Work ID','User Type','Email','Contact','Username')
-               self.case_table=ttk.Treeview(container,columns=column_one,xscrollcommand=self.scroll_y.set,yscrollcommand=self.scroll_y.set)
+        self.combobox=ttk.Combobox(container,textvariable=self.usertype, font=('yu gothic ui', 16, "bold"))
+        self.combobox['value']=('Clerk','Judge')
+        self.combobox.current(0)
+        self.combobox.grid(row=3, column=1)
+    def tree_view(self,container,function2):
+        self.scroll_x=ttk.Scrollbar(container,orient='horizontal')
+        self.scroll_y=ttk.Scrollbar(container,orient='vertical')
+        column_one=('First Name','Second Name','Work ID','User Type','Email','Contact','Username','Date Created')
+        self.case_table=ttk.Treeview(container,columns=column_one,xscrollcommand=self.scroll_y.set,yscrollcommand=self.scroll_y.set)
 
-               self.scroll_x.pack(side='bottom',fill='x')
-               self.scroll_y.pack(side='right',fill='y')
+        self.scroll_x.pack(side='bottom',fill='x')
+        self.scroll_y.pack(side='right',fill='y')
 
 
-               self.scroll_x=ttk.Scrollbar(command=self.case_table.xview)
-               self.scroll_y=ttk.Scrollbar(command=self.case_table.yview)
-               column_two=('First Name','Second Name','Work ID','User Type','Email','Contact','Username')
+        self.scroll_x=ttk.Scrollbar(command=self.case_table.xview)
+        self.scroll_y=ttk.Scrollbar(command=self.case_table.yview)
+        column_two=('First Name','Second Name','Work ID','User Type','Email','Contact','Username','Date Created')
 
-               for x,y in zip(column_one,column_two):
-                 self.case_table.heading(x,text=y)
-               for x in column_one:
-                 self.case_table.column(x,width=100)
+        for x,y in zip(column_one,column_two):
+            self.case_table.heading(x,text=y)
+        for x in column_one:
+            self.case_table.column(x,width=100)
 
-               self.case_table['show']='headings'
-               self.case_table.pack(fill='both',expand=1)    
+        self.case_table['show']='headings'
+        self.case_table.pack(fill='both',expand=1) 
+        self.case_table.bind("<ButtonRelease-1>",function2)  
+        self.fetch_data()
+
+    def fetch_data(self):
+        db = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="1caleb2denzeil",
+            database="Judiciary"
+        )
+        my_cursor = db.cursor()
+        sql_query="SELECT First_name,Second_name,Work_ID,User_type,Email,Contact,Username, Date_created from admin_information"
+        my_cursor.execute(sql_query)
+        rows = my_cursor.fetchall()
+        if len(rows) != 0:
+            case_table = self.case_table
+            case_table.delete(*case_table.get_children())
+            for i in rows:
+                case_table.insert("", END, values=i)
+            db.commit()
+        db.close()   
+     
         
 
 class Admin_Panel(tk.Tk):
@@ -47,7 +68,7 @@ class Admin_Panel(tk.Tk):
         self.geometry('1200x700')
         self.configure(bg='#FF884C')
 
-        self.search=tk.StringVar()
+        self.search_string=tk.StringVar()
         self.first=tk.StringVar()
         self.second=tk.StringVar()
         self.work=tk.StringVar()
@@ -56,6 +77,7 @@ class Admin_Panel(tk.Tk):
         self.password_string=tk.StringVar()
         self.repeat_string=tk.StringVar()
         self.username_string=tk.StringVar()
+        self.datecreated_string=tk.StringVar()
 
 
         #===========Frames======================#
@@ -76,10 +98,10 @@ class Admin_Panel(tk.Tk):
         #======================================================#
 
         #===============Search Frame=====================#
-        self.search_label=tk.Button(self.search_frame,text='Search',bg='#2C73C7',fg='white',width=10,font=('yu Gothic ui',18))
-        self.search_label.place(x=1,height=40)
+        self.search_button=tk.Button(self.search_frame,text='Search',command=self.search_function, bg='#2C73C7',fg='white',width=10,font=('yu Gothic ui',18))
+        self.search_button.place(x=1,height=40)
 
-        self.search_entry = tk.Entry(self.search_frame, highlightthickness=0, relief='flat', textvariable=self.search ,bg="lightgrey", fg="#6b6a69",
+        self.search_entry = tk.Entry(self.search_frame, highlightthickness=0, relief='flat', textvariable=self.search_string ,bg="lightgrey", fg="#6b6a69",
                                     font=("yu gothic ui ", 23, "bold"), insertbackground = '#6b6a69')
         self.search_entry.place(x=130,height=40,width=200)
         #===============================================#
@@ -105,8 +127,8 @@ class Admin_Panel(tk.Tk):
 
         self.user_type=tk.Label(self.main_frame,text='User Type',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat',)
         self.user_type.grid(row=3,column=0,sticky='W',pady=7)
-        my_user=ttk_window(self)
-        my_user.combo_type(self.main_frame)
+        self.my_user=ttk_window(self)
+        self.my_user.combo_type(self.main_frame)
 
         
         self.email=tk.Label(self.main_frame,text='Email',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat',)
@@ -124,13 +146,13 @@ class Admin_Panel(tk.Tk):
         self.password=tk.Label(self.main_frame,text='Password',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat',)
         self.password.grid(row=7,column=0,sticky='W',pady=7)
         self.password_entry= tk.Entry(self.main_frame, highlightthickness=0, relief='flat',textvariable=self.password_string, bg="lightgrey", fg="#6b6a69",
-                                    font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
+                                    font=("yu gothic ui ", 16, "bold"),show="*" ,insertbackground = '#6b6a69')
         self.password_entry.grid(row=7,column=1,pady=7)
        
         self.repeat_password=tk.Label(self.main_frame,text='Repeat Password',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat',)
         self.repeat_password.grid(row=8,column=0,sticky='W',pady=7)
         self.repeat_entry= tk.Entry(self.main_frame, highlightthickness=0, relief='flat',textvariable=self.repeat_string, bg="lightgrey", fg="#6b6a69",
-                                    font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
+                                    font=("yu gothic ui ", 16, "bold"),show="*" ,insertbackground = '#6b6a69')
         self.repeat_entry.grid(row=8,column=1,pady=7)
         
 
@@ -139,39 +161,188 @@ class Admin_Panel(tk.Tk):
         self.username_entry= tk.Entry(self.main_frame, highlightthickness=0, relief='flat',textvariable=self.username_string, bg="lightgrey", fg="#6b6a69",
                                     font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
         self.username_entry.grid(row=0,column=4,pady=7)
+
+        self.date_created=tk.Label(self.main_frame,text='Date Created',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat',)
+        self.date_created.grid(row=1,column=3,sticky='W',pady=7)
+        self.date_entry= tk.Entry(self.main_frame, highlightthickness=0, relief='flat',textvariable=self.datecreated_string, bg="lightgrey", fg="#6b6a69",
+                                    font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
+        self.date_entry.grid(row=1,column=4,pady=7)
         #=============================================================================================#
         #=======================Buttons===============================================================#
+        self.txtprescription=tk.Text(self.second_frame,font=('yu gothic ui',14,"bold"),fg='white',bg='#E4CFBC',padx=2,pady=6,width=36,height=17)
+        self.txtprescription.grid(row=0,column=0)
 
-        self.details=tk.Button(self.button_frame,text='Details',bg='#d77337',fg='white',font=('Goudy old style',18))
+        self.details=tk.Button(self.button_frame,text='Details',command=self.user_details, bg='#d77337',fg='white',font=('Goudy old style',18))
         self.details.place(x=2,y=5,width=163)
 
-        self.submit_details=tk.Button(self.button_frame,text='Submit Details',bg='#d77337',fg='white',font=('Goudy old style',18))
+        self.submit_details=tk.Button(self.button_frame,text='Submit Details',command=self.submit_and_function ,bg='#d77337',fg='white',font=('Goudy old style',18))
         self.submit_details.place(x=2,y=90,width=163)
 
-        self.update_button=tk.Button(self.button_frame,text='Update Details',bg='#d77337',fg='white',font=('Goudy old style',18))
+        self.update_button=tk.Button(self.button_frame,text='Update Details',command=self.update_function, bg='#d77337',fg='white',font=('Goudy old style',18))
         self.update_button.place(x=2,y=180,width=163)
 
         self.delete_button=tk.Button(self.button_frame,text='Delete Details',bg='#d77337',fg='white',font=('Goudy old style',18))
         self.delete_button.place(x=2,y=265,width=163)
 
+        self.exit_button=tk.Button(self.button_frame,text='Clear',bg='#d77337',fg='white',font=('Goudy old style',18))
+        self.exit_button.place(x=2,y=345,width=163)
+
         
-        self.exit_button=tk.Button(self.button_frame,text='Exit',bg='#d77337',fg='white',font=('Goudy old style',18))
-        self.exit_button.place(x=2,y=350,width=163)
+        self.clear_button=tk.Button(self.button_frame,text='Exit',bg='#d77337',fg='white',font=('Goudy old style',18))
+        self.clear_button.place(x=2,y=420,width=163)
 
         #=================Display frame================#
-        my_user.tree_view(self.display_frame)
+        self.my_user.tree_view(self.display_frame,self.get_treedetails)
 
-       
+        #===========Functionalities====================#
+    def submit(self):
+             if self.password_string.get() != self.repeat_string.get():
+                  messagebox.showerror("Error","Passwords have to match")
+             else:
+                   db=mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="1caleb2denzeil",
+                    database="Judiciary"
+                     )        
+                   cursor=db.cursor()
 
-       
-       
-       
-       
-        
-        
-        
+                   try:
+                        user=self.my_user.usertype.get()
+                        sql_query="INSERT INTO admin_information(First_name,Second_name,Work_ID,User_type,Email,Contact,Pass_word,Password_repeat,Username, Date_created ) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                        values=(self.first.get()
+                             ,self.second.get()
+                             ,self.work.get()
+                             ,user
+                             ,self.email_string.get()
+                             ,self.contact_string.get()
+                             ,self.password_string.get()
+                             ,self.repeat_string.get()
+                             ,self.username_string.get()
+                             ,self.datecreated_string.get())
+                        cursor.execute(sql_query,values)
+                        db.commit()
+                        messagebox.showinfo("Success","Details submitted sucessfully")
+                   except mysql.connector.Error as error:
+                        messagebox.showerror("Error",str(error)) 
+                   finally:
+                       cursor.close()
+                       self.my_user.fetch_data()
+                       db.close()  
+    def get_treedetails(self,event=""):
+         tree_row = self.my_user.case_table.focus()
+         content = self.my_user.case_table.item(tree_row)
+         user=self.my_user.usertype
+         row=content['values']
+         self.first.set(row[0])
+         self.second.set(row[1])
+         self.work.set(row[2])
+         user.set(row[3])
+         self.email_string.set(row[4])
+         self.contact_string.set(row[5])
+         self.username_string.set(row[6])
+         self.datecreated_string.set(row[7])
+    
+    def search_function(self):
+         
+         db=mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="1caleb2denzeil",
+                    database="Judiciary"
+                     )        
+         cursor=db.cursor()
+         try:
+              search=self.search_string.get()
+              user=self.my_user.usertype.get()
+              sql_query="SELECT First_name,Second_name,Work_ID,User_type,Email,Contact,Pass_word,Password_repeat,Username, Date_created FROM admin_information WHERE Work_ID=%s "
+              cursor.execute(sql_query,(search,))
+              row=cursor.fetchone()
+              
+              if row is None:
+                    messagebox.showinfo("No Results", "No information found for the given search query.")
+              else:
+                  user=self.my_user.usertype
+                  self.first.set(row[0])
+                  self.second.set(row[1])
+                  self.work.set(row[2])
+                  user.set(row[3])
+                  self.email_string.set(row[4])
+                  self.contact_string.set(row[5])
+                  self.password_string.set(row[6])
+                  self.repeat_string.set(row[7])
+                  self.username_string.set(row[8])
+                  self.datecreated_string.set(row[9])
+                        
+
+         except mysql.connector.Error as error:
+                messagebox.showerror("Error",str(error)) 
+         finally:
+              cursor.close()
+              db.close()
+    def update_function(self):
+          db=mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="1caleb2denzeil",
+                    database="Judiciary"
+                     )        
+          cursor=db.cursor()
+          try:
+            
+              user=self.my_user.usertype.get()
+              sql_query="UPDATE admin_information SET First_name=%s,Second_name=%s,User_type=%s,Email=%s,Contact=%s,Pass_word=%s,Password_repeat=%s,Username=%s, Date_created=%s WHERE Work_ID=%s "
+              values=(self.first.get()
+                             ,self.second.get()
+                             ,user
+                             ,self.email_string.get()
+                             ,self.contact_string.get()
+                             ,self.password_string.get()
+                             ,self.repeat_string.get()
+                             ,self.username_string.get()
+                             ,self.datecreated_string.get()
+                             ,self.work.get())
+              cursor.execute(sql_query,values)
+
+              update_workID="UPDATE admin_information SET Work_ID=%s WHERE First_name=%s"
+              workid_values=(self.work.get(),self.first.get())
+              cursor.execute(update_workID,workid_values)
 
 
+              db.commit()
+              messagebox.showinfo("Success","User Details Updated Succesfully")
+          except mysql.connector.Error as error:
+                messagebox.showerror("Error",str(error)) 
+          finally:
+              cursor.close()
+              self.my_user.fetch_data()
+              db.close()
+    def user_details(self):
+         
+         user=self.my_user.usertype.get()
+         self.txtprescription.insert(END,"First Name:\t" + self.first.get() + "\n")
+         self.txtprescription.insert(END,"Second Name:\t" + self.second.get() + "\n")
+         self.txtprescription.insert(END,"Work ID:\t" + self.work.get() + "\n")
+         self.txtprescription.insert(END,"User Type:\t" + user + "\n")
+         self.txtprescription.insert(END,"Email:\t" + self.email_string.get() + "\n")
+         self.txtprescription.insert(END,"Contact:\t" + self.contact_string.get() + "\n")
+         self.txtprescription.insert(END,"Password:\t" + self.password_string.get() + "\n")
+         self.txtprescription.insert(END,"Repeat Password:\t" + self.repeat_entry.get() + "\n")
+         self.txtprescription.insert(END,"Username:\t" + self.username_string.get() + "\n")
+         self.txtprescription.insert(END,"Date created:\t" + self.datecreated_string.get() + "\n")
+
+    def submit_and_function(self):
+         self.submit()
+         self.user_details()   
+
+    def delete_function(self):
+               
+
+              
+         
+
+           
+                    
 if __name__ == "__main__":
     admin=Admin_Panel()
     admin.mainloop()        
