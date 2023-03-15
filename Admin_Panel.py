@@ -181,15 +181,15 @@ class Admin_Panel(tk.Tk):
         self.update_button=tk.Button(self.button_frame,text='Update Details',command=self.update_function, bg='#d77337',fg='white',font=('Goudy old style',18))
         self.update_button.place(x=2,y=180,width=163)
 
-        self.delete_button=tk.Button(self.button_frame,text='Delete Details',bg='#d77337',fg='white',font=('Goudy old style',18))
+        self.delete_button=tk.Button(self.button_frame,text='Delete Details',command=self.delete_function,bg='#d77337',fg='white',font=('Goudy old style',18))
         self.delete_button.place(x=2,y=265,width=163)
 
-        self.exit_button=tk.Button(self.button_frame,text='Clear',bg='#d77337',fg='white',font=('Goudy old style',18))
-        self.exit_button.place(x=2,y=345,width=163)
+        self.clear_button=tk.Button(self.button_frame,text='Clear',command=self.clear_entries ,bg='#d77337',fg='white',font=('Goudy old style',18))
+        self.clear_button.place(x=2,y=345,width=163)
 
         
-        self.clear_button=tk.Button(self.button_frame,text='Exit',bg='#d77337',fg='white',font=('Goudy old style',18))
-        self.clear_button.place(x=2,y=420,width=163)
+        self.exit_button=tk.Button(self.button_frame,text='Exit',bg='#d77337',command=self.exit,fg='white',font=('Goudy old style',18))
+        self.exit_button.place(x=2,y=420,width=163)
 
         #=================Display frame================#
         self.my_user.tree_view(self.display_frame,self.get_treedetails)
@@ -336,12 +336,48 @@ class Admin_Panel(tk.Tk):
          self.user_details()   
 
     def delete_function(self):
-               
+          db=mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="1caleb2denzeil",
+                    database="Judiciary"
+                     )        
+          cursor=db.cursor()
 
-              
-         
+          try:
+            
+            sql_query="DELETE FROM admin_information where WORK_ID=%s"
+            worker=self.work.get()
+            values=(worker)
+            cursor.execute(sql_query,(values,))
+            db.commit()
+            messagebox.showinfo("Success","User details deleted sucessfully")
 
-           
+          except mysql.connector.Error as error:
+                        messagebox.showerror("Error",str(error)) 
+
+          finally:
+                       cursor.close()
+                       self.my_user.fetch_data()
+                       db.close()  
+
+    def clear_entries(self):
+         user=self.my_user.usertype
+         self.first.set(" ")
+         self.second.set(" ")
+         self.work.set(" ")
+         user.set(" ")
+         self.email_string.set(" ")
+         self.contact_string.set(" ")
+         self.password_string.set(" ")
+         self.repeat_string.set(" ")
+         self.username_string.set(" ")
+         self.datecreated_string.set(" ")
+
+    def exit(self):
+         exited=messagebox.askyesno("Judiciary Case Management System","Would you like to exit?") 
+         if exited>0:
+              self.destroy()             
                     
 if __name__ == "__main__":
     admin=Admin_Panel()
