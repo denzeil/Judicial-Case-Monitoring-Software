@@ -20,7 +20,7 @@ class ttk_frame(ttk.Frame):
     def combo_box(self, container):
         
         self.combobox=ttk.Combobox(container,textvariable=self.casestatus_string, font=('arial bold',12), width=33)
-        self.combobox['value']=('Active','pending')
+        self.combobox['value']=('Active','pending','Approved','Rejected','Dismissed','Closed','In progress','On hold','Settled','Resolved','Under review','Withdrawn')
         self.combobox.current(0)
         self.combobox.grid(row=7, column=1)
     
@@ -215,23 +215,23 @@ class Judiciary(tk.Tk):
         self.txtprescription=tk.Text(self.DataFrameRight,font=('arial bold',12),fg='white',bg='#3A88AA',padx=2,pady=6,width=36,height=17)
         self.txtprescription.grid(row=0,column=0)
  
-        self.Showdetails=tk.Button(self.ButtonFrame,text='Submit Details',command=self.submit, bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
+        self.Showdetails=tk.Button(self.ButtonFrame,text='Submit Details',command=self.print_out, bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.Showdetails.grid(row=0,column=1,ipady=1)
 
-        self.case_detailsbutton=tk.Button(self.ButtonFrame,text='Case Details',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
+        self.case_detailsbutton=tk.Button(self.ButtonFrame,text='Case Details',command=self.case_details,bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.case_detailsbutton.grid(row=0,column=2,ipady=1)
         
-        self.update_button=tk.Button(self.ButtonFrame,text='Update',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
+        self.update_button=tk.Button(self.ButtonFrame,text='Update',command=self.update_data, bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.update_button.grid(row=0,column=3,ipady=1)
         
-        self.delete_button=tk.Button(self.ButtonFrame,text='Delete',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
+        self.delete_button=tk.Button(self.ButtonFrame,text='Delete',command=self.delete_details ,bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.delete_button.grid(row=0,column=4,ipady=1)
 
-        self.clear_button=tk.Button(self.ButtonFrame,text='Clear',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
+        self.clear_button=tk.Button(self.ButtonFrame,text='Clear',command=self.clear_details, bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.clear_button.grid(row=0,column=5,ipady=1)
         
         
-        self.exit_button=tk.Button(self.ButtonFrame,text='Exit',bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
+        self.exit_button=tk.Button(self.ButtonFrame,text='Exit',command=self.exit ,bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.exit_button.grid(row=0,column=6,ipady=1)
 
         # ==================================Scrollbar========================
@@ -242,7 +242,7 @@ class Judiciary(tk.Tk):
             if self.caseid_string.get()== " " or self.appearances_string == " ":
                 messagebox.showerror('Error','All fields are required')
             else:
-                #establish a connection
+                 #establish a connection
                     db=mysql.connector.connect(
                     host="localhost",
                     user="root",
@@ -281,6 +281,9 @@ class Judiciary(tk.Tk):
                         cursor.close()
                         self.my_object.fetch_data()
                         db.close()
+        
+                #establish a connection
+                  
         
     def get_treedetails(self,event=""):
         tree_row = self.my_object.case_table.focus()
@@ -341,6 +344,118 @@ class Judiciary(tk.Tk):
                         mycursor.close()
                      
                         db.close()
+
+    def update_data(self):
+         #establish a connection
+                    db=mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="1caleb2denzeil",
+                    database="Judiciary"
+                     )    
+                #create a cursor
+                    cursor=db.cursor()
+            
+                    try:
+                        casestatus=self.my_object.casestatus_string.get()
+                        judgename=self.my_object.judgename_string.get()
+
+                        #update the judge_query
+                        judge_tables="UPDATE judge_information SET Judge_name=%s,Judge_email=%s,Judge_contact=%s WHERE Judge_ID=%s "
+                        judge_values=(judgename,self.judgeemail_string.get(),self.judgecontact_string.get(),self.judge_stringid.get())
+                        cursor.execute(judge_tables,judge_values)
+
+
+                        sql_tables="UPDATE client_information SET Case_ID=%s, Client_name=%s ,Client_Contact=%s ,Case_type=%s, Case_status=%s, Appearances=%s, Billing_ksh=%s, Hearing_date=%s, Next_hearing=%s, Laywer_name=%s, Laywer_contact=%s,Date_filed=%s WHERE Judge_ID=%s"
+                        client_values=(self.caseid_string.get(),self.clientname_string.get(),self.clientcontact_string.get(),self.casetype_string.get(), casestatus ,self.appearances_string.get(),self.billing_string.get()
+                                      ,self.hearingdate_string.get(),self.nexthearing_string.get() ,
+                                      self.lawyername_string.get(), self.lawyercontact_string.get(),self.datefiled_string.get(),self.judge_stringid.get())
+                        cursor.execute(sql_tables,client_values)
+                        
+                        #Insert into judge information
+                       
+                        db.commit()
+                        messagebox.showinfo("Success","Case Details Updated successfully")
+                        
+                    
+                    except mysql.connector.Error as error:
+                        messagebox.showerror("Error",str(error))
+
+                           
+                    finally:
+                        cursor.close()
+                        self.my_object.fetch_data()
+                        db.close()
+    
+    def case_details(self):
+         casestatus=self.my_object.casestatus_string.get()
+         judgename=self.my_object.judgename_string.get()
+         self.txtprescription.insert(END,"Case ID:\t\t\t" + self.caseid_string.get() + "\n")
+         self.txtprescription.insert(END,"Client's name:\t\t\t" + self.clientname_string.get() + "\n")
+         self.txtprescription.insert(END,"Client's contact:\t\t\t" + self.clientcontact_string.get() + "\n")
+         self.txtprescription.insert(END,"Lawyer's name:\t\t\t" + self.lawyercontact_string.get() + "\n")
+         self.txtprescription.insert(END,"Lawyer's Contact:\t\t\t" + self.lawyercontact_string.get() + "\n")
+         self.txtprescription.insert(END,"Date Filed:\t\t\t" + self.datefiled_string.get() + "\n")
+         self.txtprescription.insert(END,"Case Status:\t\t\t" + casestatus + "\n")
+         self.txtprescription.insert(END,"Court Appearances:\t\t\t" + self.appearances_string.get() + "\n")
+         self.txtprescription.insert(END,"Judge's name:\t\t\t" + judgename + "\n")
+         self.txtprescription.insert(END,"Judge's email:\t\t\t" + self.judgeemail_string.get() + "\n")
+         self.txtprescription.insert(END,"Judge's Contact:\t\t\t" + self.judgecontact_string.get() + "\n")
+         self.txtprescription.insert(END,"Judge ID:\t\t\t" + self.judge_stringid.get() + "\n")
+         self.txtprescription.insert(END,"Hearing Date:\t\t\t" + self.hearingdate_string.get() + "\n")
+         self.txtprescription.insert(END,"Next Hearing:\t\t\t" + self.nexthearing_string.get() + "\n")
+    
+    def print_out(self):
+         self.submit()
+         self.case_details()
+
+    def delete_details(self):
+         db=mysql.connector.connect(
+                    host="localhost",
+                    user="root",
+                    password="1caleb2denzeil",
+                    database="Judiciary" ) 
+         try:
+           cursor=db.cursor()   
+           client_query="DELETE FROM client_information WHERE Judge_ID=%s"
+           cursor.execute(client_query,(self.judge_stringid.get(),))
+           
+           judge_query="DELETE FROM judge_information where Judge_ID=%s"
+           cursor.execute(judge_query,(self.judge_stringid.get(),))
+
+           db.commit()
+           messagebox.showinfo("Success","Case Details deleted succesfully")
+
+         except mysql.connector.Error as error:
+             messagebox.showerror("Error",str(error))  
+              
+         finally:
+              cursor.close()
+              db.close()
+    def clear_details(self):
+        casestatus=self.my_object.casestatus_string
+        judgename=self.my_object.judgename_string
+        self.caseid_string.set(" ")
+        self.clientname_string.set(" ")
+        self.clientcontact_string.set(" ")
+        self.casetype_string.set(" ")
+        casestatus.set(" ")
+        self.appearances_string.set(" ")
+        self.billing_string.set(" ")
+        self.judge_stringid.set(" ") 
+        self.hearingdate_string.set(" ")
+        self.nexthearing_string.set(" ")
+        self.lawyername_string.set(" ")
+        self.lawyercontact_string.set(" ")
+        self.datefiled_string.set(" ")
+        judgename.set(" ")
+        self.judgeemail_string.set(" ")
+        self.judgecontact_string.set(" ")
+
+    def exit(self):
+         exited=messagebox.askyesno("Judiciary Case Management System","Would you like to exit?") 
+         if exited>0:
+              self.destroy()
 
 if __name__ == "__main__":        
     Jud=Judiciary()
