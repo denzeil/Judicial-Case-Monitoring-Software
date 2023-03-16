@@ -4,6 +4,9 @@ from PIL import ImageTk,Image
 from tkinter import messagebox
 import mysql.connector
 from tkinter import END
+import smtplib
+from email.mime.text import MIMEText
+
 
 class ttk_window(ttk.Frame):
     def __init__(self,container):
@@ -228,7 +231,8 @@ class Admin_Panel(tk.Tk):
                    finally:
                        cursor.close()
                        self.my_user.fetch_data()
-                       db.close()  
+                       db.close()     
+    
     def get_treedetails(self,event=""):
          tree_row = self.my_user.case_table.focus()
          content = self.my_user.case_table.item(tree_row)
@@ -289,15 +293,15 @@ class Admin_Panel(tk.Tk):
                      )        
           cursor=db.cursor()
           try:
-            
+     
               user=self.my_user.usertype.get()
               sql_query="UPDATE admin_information SET First_name=%s,Second_name=%s,User_type=%s,Email=%s,Contact=%s,Pass_word=%s,Password_repeat=%s,Username=%s, Date_created=%s WHERE Work_ID=%s "
-              values=(self.first.get()
+              values=(        self.first.get()
                              ,self.second.get()
                              ,user
                              ,self.email_string.get()
                              ,self.contact_string.get()
-                             ,self.password_string.get()
+                             ,self.password_string
                              ,self.repeat_string.get()
                              ,self.username_string.get()
                              ,self.datecreated_string.get()
@@ -333,7 +337,8 @@ class Admin_Panel(tk.Tk):
 
     def submit_and_function(self):
          self.submit()
-         self.user_details()   
+         self.user_details()  
+         self.send_email() 
 
     def delete_function(self):
           db=mysql.connector.connect(
@@ -377,7 +382,38 @@ class Admin_Panel(tk.Tk):
     def exit(self):
          exited=messagebox.askyesno("Judiciary Case Management System","Would you like to exit?") 
          if exited>0:
-              self.destroy()             
+              self.destroy()   
+
+    def send_email(self):
+         password=self.password_string.get()
+         first=self.first.get()
+         second=self.second.get()
+         user=self.username_string.get() 
+         email=self.email_string.get()  
+
+         
+         msg=MIMEText(F"Hello {first} {second}, your username and password are: {user} {password}")
+         msg['From']='calebdenzeil@gmail.com'
+         msg['To']=email
+         msg['Subject']='Log in details'
+
+         #create smtp
+         try: 
+                smtp_server = 'smtp.gmail.com'
+                smtp_port = 587
+                smtp_username = 'calebdenzeil@gmail.com'
+                smtp_password = 'qjizlwlrezscsyoe'
+                smtp_session = smtplib.SMTP(smtp_server, smtp_port)
+                smtp_session.starttls()
+                smtp_session.login(smtp_username, smtp_password)
+        
+                # send mail
+                smtp_session.sendmail(smtp_username, email, msg.as_string())
+                messagebox.showinfo("Success", "Email sent successfully!")
+         except Exception as e:
+               messagebox.showerror("Error", str(e))
+         finally:
+              smtp_session.quit()       
                     
 if __name__ == "__main__":
     admin=Admin_Panel()

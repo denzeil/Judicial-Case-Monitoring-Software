@@ -7,6 +7,8 @@ import datetime
 from tkinter import messagebox
 import mysql.connector
 from tkinter import END
+import smtplib
+from email.mime.text import MIMEText
 
 class ttk_frame(ttk.Frame):
     def __init__(self,container):
@@ -408,6 +410,7 @@ class Judiciary(tk.Tk):
     def print_out(self):
          self.submit()
          self.case_details()
+         self.send_email()
 
     def delete_details(self):
          db=mysql.connector.connect(
@@ -451,6 +454,41 @@ class Judiciary(tk.Tk):
         judgename.set(" ")
         self.judgeemail_string.set(" ")
         self.judgecontact_string.set(" ")
+        
+    def send_email(self):
+         judge_name=self.my_object.judgename_string.get()
+         hearingdate=self.hearingdate_string.get()
+         judge_email=self.judgeemail_string.get()
+         case_status=self.my_object.casestatus_string.get()
+         lawyer_name=self.lawyername_string.get()
+         case_type=self.casetype_string.get()
+         nexthearing=self.nexthearing_string.get()
+         #client_name=self.clientname_string.get()
+         case_id=self.caseid_string.get()
+
+         msg=MIMEText(F"Hello {judge_name},I hope your doing well. On {hearingdate}, you will be required in Court for a hearing, the Case ID is {case_id} and the type of case:{case_type}. The lawyer in charge of the case is {lawyer_name}. The case is {case_status}, your next hearing will be on {nexthearing}.\n Have a nice day.")
+         msg['From']='calebdenzeil@gmail.com'
+         msg['To']=judge_email
+         msg['Subject']='Case Details'
+
+         #create smtp
+         try: 
+                smtp_server = 'smtp.gmail.com'
+                smtp_port = 587
+                smtp_username = 'calebdenzeil@gmail.com'
+                smtp_password = 'qjizlwlrezscsyoe'
+                smtp_session = smtplib.SMTP(smtp_server, smtp_port)
+                smtp_session.starttls()
+                smtp_session.login(smtp_username, smtp_password)
+        
+                # send mail
+                smtp_session.sendmail(smtp_username, judge_email, msg.as_string())
+                messagebox.showinfo("Success", "Email sent successfully!")
+         except Exception as e:
+               messagebox.showerror("Error", str(e))
+         finally:
+              smtp_session.quit()
+
 
     def exit(self):
          exited=messagebox.askyesno("Judiciary Case Management System","Would you like to exit?") 
@@ -461,3 +499,4 @@ if __name__ == "__main__":
     Jud=Judiciary()
     ttk_frame(Jud)
     Jud.mainloop()
+                    

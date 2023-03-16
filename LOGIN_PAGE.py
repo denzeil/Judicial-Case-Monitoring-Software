@@ -2,7 +2,9 @@ import tkinter as tk
 from tkinter import ttk 
 from PIL import ImageTk,Image
 from tkinter import messagebox
-import _mysql_connector
+import mysql.connector
+import bcrypt
+from JUDI_CASE import Judiciary,ttk_frame
 
 class login(tk.Tk):
     def __init__(self):
@@ -46,13 +48,43 @@ class login(tk.Tk):
                                     font=("yu gothic ui ", 12, "bold"), insertbackground = '#6b6a69',show="*")
         self.password_entry.place(x=260, y=250, width=270,height=50)
 
-        self.submit_button=tk.Button(self.main_frame,text='Submit Details',bg='#d77337',fg='white',width=20,pady=6,padx=2,font=('Goudy old style',18))
+        self.submit_button=tk.Button(self.main_frame,text='Submit Details',command=self.login,bg='#d77337',fg='white',width=20,pady=6,padx=2,font=('Goudy old style',18))
         self.submit_button.place(x=200,y=350)
 
+        #================functionalities+===================#
+    def login(self):
+            db=mysql.connector.connect(host="localhost",
+                user="root",
+                password="1caleb2denzeil",
+                database="Judiciary")
+            cursor=db.cursor()
+            username=self.username.get()
+            salt=bcrypt.gensalt()
+            password=self.password.get().encode('utf-8')
+            try:
+                cursor.execute("SELECT Pass_word FROM admin_information WHERE Username=%s",(username,))
+                result=cursor.fetchone()
+                if result:
+                  hashed_password=result[0]
+                  hashed_password=bcrypt.hashpw(hashed_password.encode('utf-8'),salt)
+                  if bcrypt.checkpw(password,hashed_password):
+                    messagebox.showinfo("Success","Log in succesful")
+                    self.destroy()
+                    Jud=Judiciary()
+                    ttk_frame(Jud)
+                    Jud.mainloop()
+            
+                  else:
+                        messagebox.showerror("Error","Invalid Password")   
 
-
-
-        
+                else:
+                    messagebox.showerror("Error","Invalid Username")
+            except mysql.connector.Error as error:
+                messagebox.showerror("Error",str(error))
+            finally:
+                cursor.close()
+                db.close()  
+                      
 
 if __name__ =="__main__":
     log=login()

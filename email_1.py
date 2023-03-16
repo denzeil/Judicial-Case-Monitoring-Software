@@ -6,7 +6,7 @@ from tkinter import *
 def send_email():
     # Get the values from the Entry widgets
     sender = sender_entry.get()
-    password ="wkvgetwhhdmixsdr"
+    password ="1caleb2denzeil"
     recipient = recipient_entry.get()
     subject = subject_entry.get()
     body = body_text.get(1.0, END)
