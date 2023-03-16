@@ -6,6 +6,7 @@ import mysql.connector
 from tkinter import END
 import smtplib
 from email.mime.text import MIMEText
+from JUDI_CASE import Judiciary,ttk_frame
 
 
 class ttk_window(ttk.Frame):
@@ -96,7 +97,7 @@ class Admin_Panel(tk.Tk):
         self.button_frame=tk.LabelFrame(self,bg="white")
         self.button_frame.place(width=170,height=470,x=850,y=70)
 
-        self.display_frame=tk.Frame(self,bg="white")
+        self.display_frame=tk.Frame(self,bg="grey")
         self.display_frame.place(width=1350,height=200,x=10,y=550)
         #======================================================#
 
@@ -109,7 +110,7 @@ class Admin_Panel(tk.Tk):
         self.search_entry.place(x=130,height=40,width=200)
         #===============================================#
         #==============Main Frame====================#
-        self.first_name=tk.Label(self.main_frame,text='First Name',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='White',relief='flat')
+        self.first_name=tk.Label(self.main_frame,text='First Name',font=('yu gothic ui', 16, "bold"),fg='#100A06',bg='white',relief='flat')
         self.first_name.grid(row=0,column=0,sticky='W')
         self.first_entry = tk.Entry(self.main_frame, highlightthickness=0, relief='flat',textvariable=self.first, bg="lightgrey", fg="#6b6a69",
                                     font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
@@ -172,27 +173,32 @@ class Admin_Panel(tk.Tk):
         self.date_entry.grid(row=1,column=4,pady=7)
         #=============================================================================================#
         #=======================Buttons===============================================================#
-        self.txtprescription=tk.Text(self.second_frame,font=('yu gothic ui',14,"bold"),fg='white',bg='#E4CFBC',padx=2,pady=6,width=36,height=17)
+        self.txtprescription=tk.Text(self.second_frame,font=('yu gothic ui',14,"bold"),bg='#94897F',padx=5,pady=6,width=28,height=16)
         self.txtprescription.grid(row=0,column=0)
 
         self.details=tk.Button(self.button_frame,text='Details',command=self.user_details, bg='#d77337',fg='white',font=('Goudy old style',18))
         self.details.place(x=2,y=5,width=163)
 
         self.submit_details=tk.Button(self.button_frame,text='Submit Details',command=self.submit_and_function ,bg='#d77337',fg='white',font=('Goudy old style',18))
-        self.submit_details.place(x=2,y=90,width=163)
+        self.submit_details.place(x=2,y=70,width=163)
 
         self.update_button=tk.Button(self.button_frame,text='Update Details',command=self.update_function, bg='#d77337',fg='white',font=('Goudy old style',18))
-        self.update_button.place(x=2,y=180,width=163)
+        self.update_button.place(x=2,y=140,width=163)
 
         self.delete_button=tk.Button(self.button_frame,text='Delete Details',command=self.delete_function,bg='#d77337',fg='white',font=('Goudy old style',18))
-        self.delete_button.place(x=2,y=265,width=163)
+        self.delete_button.place(x=2,y=210,width=163)
 
         self.clear_button=tk.Button(self.button_frame,text='Clear',command=self.clear_entries ,bg='#d77337',fg='white',font=('Goudy old style',18))
-        self.clear_button.place(x=2,y=345,width=163)
+        self.clear_button.place(x=2,y=280,width=163)
 
         
         self.exit_button=tk.Button(self.button_frame,text='Exit',bg='#d77337',command=self.exit,fg='white',font=('Goudy old style',18))
-        self.exit_button.place(x=2,y=420,width=163)
+        self.exit_button.place(x=2,y=350,width=163)
+
+        
+        self.mainpage_button=tk.Button(self.button_frame,text='Main Page',bg='#d77337',command=self.main_page,fg='white',font=('Goudy old style',18))
+        self.mainpage_button.place(x=2,y=420,width=163)
+
 
         #=================Display frame================#
         self.my_user.tree_view(self.display_frame,self.get_treedetails)
@@ -402,7 +408,7 @@ class Admin_Panel(tk.Tk):
                 smtp_server = 'smtp.gmail.com'
                 smtp_port = 587
                 smtp_username = 'calebdenzeil@gmail.com'
-                smtp_password = 'qjizlwlrezscsyoe'
+                smtp_password = 'lxxwhddjbziaqeuz'
                 smtp_session = smtplib.SMTP(smtp_server, smtp_port)
                 smtp_session.starttls()
                 smtp_session.login(smtp_username, smtp_password)
@@ -413,7 +419,14 @@ class Admin_Panel(tk.Tk):
          except Exception as e:
                messagebox.showerror("Error", str(e))
          finally:
-              smtp_session.quit()       
+              smtp_session.quit()    
+
+    def main_page(self):
+         self.destroy()
+         Jud=Judiciary()
+         ttk_frame(Jud)
+         Jud.mainloop()
+            
                     
 if __name__ == "__main__":
     admin=Admin_Panel()
