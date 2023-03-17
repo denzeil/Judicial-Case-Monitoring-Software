@@ -36,8 +36,8 @@ class ttk_frame(ttk.Frame):
     
     def scrollbar(self,container,function2):
        
-        column_one = ('Case_ID', 'Client_name', 'Lawyer_name', 'Judge', 'Case_Type','Case_Status', 'Date_filed', 'Appearances', 'Billing_info', 'Hearing_date', 'Next_hearing')
-        column_two = ('Case_ID', 'Client_name', 'Lawyer_name', 'Judge', 'Case_Type','Case_Status', 'Date_filed', 'Appearances', 'Billing_info', 'Hearing_date', 'Next_hearing')
+        column_one = ('Case_ID', 'Client_name', 'Judge', 'Case_Type','Case_Status', 'Date_filed', 'Appearances', 'Billing_info', 'Hearing_date', 'Next_hearing')
+        column_two = ('Case_ID', 'Client_name', 'Judge', 'Case_Type','Case_Status', 'Date_filed', 'Appearances', 'Billing_info', 'Hearing_date', 'Next_hearing')
         self.case_table = ttk.Treeview(container, columns=column_one)
 
         self.scroll_y = ttk.Scrollbar(container, orient='vertical',command=self.case_table.yview)
@@ -65,7 +65,7 @@ class ttk_frame(ttk.Frame):
             database="Judiciary"
         )
         my_cursor = db.cursor()
-        sql_query = "SELECT client_information.Case_ID, client_information.Client_name,client_information.Laywer_name, judge_information.Judge_name AS Judge, client_information.Case_type,client_information.Case_status, client_information.Date_filed, client_information.Appearances, client_information.Billing_ksh AS Billing_info, client_information.Hearing_date, client_information.Next_hearing FROM client_information JOIN judge_information ON client_information.Judge_ID = judge_information.Judge_ID "
+        sql_query = "SELECT client_information.Case_ID, client_information.Client_name, judge_information.Judge_name, client_information.Case_type,client_information.Case_status, client_information.Date_filed, client_information.Appearances, client_information.Billing_ksh, client_information.Hearing_date, client_information.Next_hearing FROM client_information JOIN judge_information ON client_information.Judge_ID = judge_information.Judge_ID "
         my_cursor.execute(sql_query)
         rows = my_cursor.fetchall()
         if len(rows) != 0:
@@ -295,6 +295,7 @@ class Judiciary(tk.Tk):
                   
         
     def get_treedetails(self,event=""):
+        casestatus=self.my_object.casestatus_string
         tree_row = self.my_object.case_table.focus()
         content = self.my_object.case_table.item(tree_row)
         self.judgename = self.my_object.judgename_string
@@ -303,11 +304,12 @@ class Judiciary(tk.Tk):
         self.clientname_string.set(row[1])
         self.judgename.set(row[2])
         self.casetype_string.set(row[3])
-        self.datefiled_string.set(row[4])
-        self.appearances_string.set(row[5])
-        self.billing_string.set(row[6])
-        self.hearingdate_string.set(row[7])
-        self.nexthearing_string.set(row[8])
+        casestatus.set(row[4])
+        self.datefiled_string.set(row[5])
+        self.appearances_string.set(row[6])
+        self.billing_string.set(row[7])
+        self.hearingdate_string.set(row[8])
+        self.nexthearing_string.set(row[9])
         
     #def delete_hide(self):
         #self.hide_button()
