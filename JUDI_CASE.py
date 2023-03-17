@@ -36,8 +36,8 @@ class ttk_frame(ttk.Frame):
     
     def scrollbar(self,container,function2):
        
-        column_one = ('Case_ID', 'Client_name', 'Lawyer_name', 'Judge', 'Case_Type', 'Date_filed', 'Appearances', 'Billing_info', 'Hearing_date', 'Next_hearing')
-        column_two = ('Case ID', 'Client Name', 'Judge', 'Case Type', 'Date filed', 'Appearances', 'Billing info', 'Hearing date', 'Next Hearing')
+        column_one = ('Case_ID', 'Client_name', 'Lawyer_name', 'Judge', 'Case_Type','Case_Status', 'Date_filed', 'Appearances', 'Billing_info', 'Hearing_date', 'Next_hearing')
+        column_two = ('Case_ID', 'Client_name', 'Lawyer_name', 'Judge', 'Case_Type','Case_Status', 'Date_filed', 'Appearances', 'Billing_info', 'Hearing_date', 'Next_hearing')
         self.case_table = ttk.Treeview(container, columns=column_one)
 
         self.scroll_y = ttk.Scrollbar(container, orient='vertical',command=self.case_table.yview)
@@ -65,7 +65,7 @@ class ttk_frame(ttk.Frame):
             database="Judiciary"
         )
         my_cursor = db.cursor()
-        sql_query = "SELECT client_information.Case_ID, client_information.Client_name, judge_information.Judge_name AS Judge, client_information.Case_type, client_information.Date_filed, client_information.Appearances, client_information.Billing_ksh AS Billing_info, client_information.Hearing_date, client_information.Next_hearing FROM client_information JOIN judge_information ON client_information.Judge_ID = judge_information.Judge_ID "
+        sql_query = "SELECT client_information.Case_ID, client_information.Client_name,client_information.Laywer_name, judge_information.Judge_name AS Judge, client_information.Case_type,client_information.Case_status, client_information.Date_filed, client_information.Appearances, client_information.Billing_ksh AS Billing_info, client_information.Hearing_date, client_information.Next_hearing FROM client_information JOIN judge_information ON client_information.Judge_ID = judge_information.Judge_ID "
         my_cursor.execute(sql_query)
         rows = my_cursor.fetchall()
         if len(rows) != 0:
