@@ -13,6 +13,7 @@ class ttk_window(ttk.Frame):
     def __init__(self,container):
         super().__init__(container)
         self.usertype=tk.StringVar() 
+        
     def combo_type(self,container):
         self.combobox=ttk.Combobox(container,textvariable=self.usertype, font=('yu gothic ui', 16, "bold"))
         self.combobox['value']=('Clerk','Judge')
@@ -21,7 +22,7 @@ class ttk_window(ttk.Frame):
     def tree_view(self,container,function2):
         self.scroll_x=ttk.Scrollbar(container,orient='horizontal')
         self.scroll_y=ttk.Scrollbar(container,orient='vertical')
-        column_one=('First Name','Second Name','Work ID','User Type','Email','Contact','Username','Date Created')
+        column_one=('First Name','Second Name','Work ID','User Type','Email','Contact','Username',"Users' Role",'Date Created')
         self.case_table=ttk.Treeview(container,columns=column_one,xscrollcommand=self.scroll_y.set,yscrollcommand=self.scroll_y.set)
 
         self.scroll_x.pack(side='bottom',fill='x')
@@ -30,7 +31,7 @@ class ttk_window(ttk.Frame):
 
         self.scroll_x=ttk.Scrollbar(command=self.case_table.xview)
         self.scroll_y=ttk.Scrollbar(command=self.case_table.yview)
-        column_two=('First Name','Second Name','Work ID','User Type','Email','Contact','Username','Date Created')
+        column_two=('First Name','Second Name','Work ID','User Type','Email','Contact','Username',"Users' Role",'Date Created')
 
         for x,y in zip(column_one,column_two):
             self.case_table.heading(x,text=y)
@@ -50,7 +51,7 @@ class ttk_window(ttk.Frame):
             database="Judiciary"
         )
         my_cursor = db.cursor()
-        sql_query="SELECT First_name,Second_name,Work_ID,User_type,Email,Contact,Username, Date_created from admin_information"
+        sql_query="SELECT First_name,Second_name,Work_ID,User_type,Email,Contact,Username,Roles, Date_created from admin_information"
         my_cursor.execute(sql_query)
         rows = my_cursor.fetchall()
         if len(rows) != 0:
@@ -60,8 +61,7 @@ class ttk_window(ttk.Frame):
                 case_table.insert("", END, values=i)
             db.commit()
         db.close()   
-     
-        
+    
 
 class Admin_Panel(tk.Tk):
     def __init__(self):
@@ -82,6 +82,7 @@ class Admin_Panel(tk.Tk):
         self.repeat_string=tk.StringVar()
         self.username_string=tk.StringVar()
         self.datecreated_string=tk.StringVar()
+        self.radio_string=tk.StringVar()
 
 
         #===========Frames======================#
@@ -171,6 +172,14 @@ class Admin_Panel(tk.Tk):
         self.date_entry= tk.Entry(self.main_frame, highlightthickness=0, relief='flat',textvariable=self.datecreated_string, bg="lightgrey", fg="#6b6a69",
                                     font=("yu gothic ui ", 16, "bold"), insertbackground = '#6b6a69')
         self.date_entry.grid(row=1,column=4,pady=7)
+
+        self.radio_label=tk.Label(self.main_frame,text="Users' Role",font=('yu gothic ui', 16, "bold"),relief='flat')
+        self.radio_label.grid(row=2,column=3)
+        self.radiobutton_one=tk.Radiobutton(self.main_frame,font=('yu gothic ui', 14, "bold"),padx=5, pady=5 ,text='Normal User',value='Normal',variable=self.radio_string)
+        self.radiobutton_one.grid(row=2,column=4)
+        self.radiobutton_two=tk.Radiobutton(self.main_frame,font=('yu gothic ui', 14, "bold"),padx=5, pady=5, text='Admin User',value='Admin',variable=self.radio_string)
+        self.radiobutton_two.grid(row=3,column=4)
+
         #=============================================================================================#
         #=======================Buttons===============================================================#
         self.txtprescription=tk.Text(self.second_frame,font=('yu gothic ui',14,"bold"),bg='#94897F',padx=5,pady=6,width=28,height=16)
@@ -194,7 +203,7 @@ class Admin_Panel(tk.Tk):
         
         self.exit_button=tk.Button(self.button_frame,text='Exit',bg='#d77337',command=self.exit,fg='white',font=('Goudy old style',18))
         self.exit_button.place(x=2,y=350,width=163)
-
+        
         
         self.mainpage_button=tk.Button(self.button_frame,text='Main Page',bg='#d77337',command=self.main_page,fg='white',font=('Goudy old style',18))
         self.mainpage_button.place(x=2,y=420,width=163)
@@ -218,7 +227,7 @@ class Admin_Panel(tk.Tk):
 
                    try:
                         user=self.my_user.usertype.get()
-                        sql_query="INSERT INTO admin_information(First_name,Second_name,Work_ID,User_type,Email,Contact,Pass_word,Password_repeat,Username, Date_created ) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                        sql_query="INSERT INTO admin_information(First_name,Second_name,Work_ID,User_type,Email,Contact,Pass_word,Password_repeat,Username, Date_created,Roles ) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
                         values=(self.first.get()
                              ,self.second.get()
                              ,self.work.get()
@@ -228,7 +237,8 @@ class Admin_Panel(tk.Tk):
                              ,self.password_string.get()
                              ,self.repeat_string.get()
                              ,self.username_string.get()
-                             ,self.datecreated_string.get())
+                             ,self.datecreated_string.get()
+                             ,self.radio_string.get())
                         cursor.execute(sql_query,values)
                         db.commit()
                         messagebox.showinfo("Success","Details submitted sucessfully")
@@ -251,7 +261,8 @@ class Admin_Panel(tk.Tk):
          self.email_string.set(row[4])
          self.contact_string.set(row[5])
          self.username_string.set(row[6])
-         self.datecreated_string.set(row[7])
+         self.radio_string.set(row[7])
+         self.datecreated_string.set(row[8])
     
     def search_function(self):
          
@@ -265,7 +276,7 @@ class Admin_Panel(tk.Tk):
          try:
               search=self.search_string.get()
               user=self.my_user.usertype.get()
-              sql_query="SELECT First_name,Second_name,Work_ID,User_type,Email,Contact,Pass_word,Password_repeat,Username, Date_created FROM admin_information WHERE Work_ID=%s "
+              sql_query="SELECT First_name,Second_name,Work_ID,User_type,Email,Contact,Pass_word,Password_repeat,Username, Date_created, Roles FROM admin_information WHERE Work_ID=%s "
               cursor.execute(sql_query,(search,))
               row=cursor.fetchone()
               
@@ -283,6 +294,7 @@ class Admin_Panel(tk.Tk):
                   self.repeat_string.set(row[7])
                   self.username_string.set(row[8])
                   self.datecreated_string.set(row[9])
+                  self.radio_string.set(row[10])
                         
 
          except mysql.connector.Error as error:
@@ -301,23 +313,23 @@ class Admin_Panel(tk.Tk):
           try:
      
               user=self.my_user.usertype.get()
-              sql_query="UPDATE admin_information SET First_name=%s,Second_name=%s,User_type=%s,Email=%s,Contact=%s,Pass_word=%s,Password_repeat=%s,Username=%s, Date_created=%s WHERE Work_ID=%s "
+              sql_query="UPDATE admin_information SET First_name=%s,Second_name=%s, User_type=%s,Email=%s,Contact=%s,Pass_word=%s,Password_repeat=%s,Username=%s, Date_created=%s, Roles=%s WHERE Work_ID=%s "
               values=(        self.first.get()
                              ,self.second.get()
                              ,user
                              ,self.email_string.get()
                              ,self.contact_string.get()
-                             ,self.password_string
+                             ,self.password_string.get()
                              ,self.repeat_string.get()
                              ,self.username_string.get()
                              ,self.datecreated_string.get()
+                             ,self.radio_string.get()
                              ,self.work.get())
               cursor.execute(sql_query,values)
 
-              update_workID="UPDATE admin_information SET Work_ID=%s WHERE First_name=%s"
-              workid_values=(self.work.get(),self.first.get())
-              cursor.execute(update_workID,workid_values)
-
+              #update_workID="UPDATE admin_information SET Work_ID=%s WHERE First_name=%s"
+              #workid_values=(self.work.get(),self.first.get())
+              #cursor.execute(update_workID,workid_values)
 
               db.commit()
               messagebox.showinfo("Success","User Details Updated Succesfully")
@@ -340,6 +352,7 @@ class Admin_Panel(tk.Tk):
          self.txtprescription.insert(END,"Repeat Password:\t" + self.repeat_entry.get() + "\n")
          self.txtprescription.insert(END,"Username:\t" + self.username_string.get() + "\n")
          self.txtprescription.insert(END,"Date created:\t" + self.datecreated_string.get() + "\n")
+         self.txtprescription.insert(END,"Users' Role:\t" + self.radio_string.get() + "\n")
 
     def submit_and_function(self):
          self.submit()
@@ -384,6 +397,7 @@ class Admin_Panel(tk.Tk):
          self.repeat_string.set(" ")
          self.username_string.set(" ")
          self.datecreated_string.set(" ")
+         self.radio_string.set(" ")
 
     def exit(self):
          exited=messagebox.askyesno("Judiciary Case Management System","Would you like to exit?") 

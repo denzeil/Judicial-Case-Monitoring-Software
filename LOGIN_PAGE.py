@@ -5,6 +5,7 @@ from tkinter import messagebox
 import mysql.connector
 import bcrypt
 from JUDI_CASE import Judiciary,ttk_frame
+from Admin_Panel import ttk_window,Admin_Panel
 
 class login(tk.Tk):
     def __init__(self):
@@ -62,17 +63,22 @@ class login(tk.Tk):
             salt=bcrypt.gensalt()
             password=self.password.get().encode('utf-8')
             try:
-                cursor.execute("SELECT Pass_word FROM admin_information WHERE Username=%s",(username,))
+                cursor.execute("SELECT Pass_word, Roles FROM admin_information WHERE Username=%s",(username,))
                 result=cursor.fetchone()
                 if result:
                   hashed_password=result[0]
                   hashed_password=bcrypt.hashpw(hashed_password.encode('utf-8'),salt)
                   if bcrypt.checkpw(password,hashed_password):
                     messagebox.showinfo("Success","Log in succesful")
-                    self.destroy()
-                    Jud=Judiciary()
-                    ttk_frame(Jud)
-                    Jud.mainloop()
+                    if result[1] == "Admin":
+                        self.destroy()
+                        admin=Admin_Panel()
+                        admin.mainloop() 
+                    else:    
+                        self.destroy()
+                        Jud=Judiciary()
+                        ttk_frame(Jud)
+                        Jud.mainloop()
             
                   else:
                         messagebox.showerror("Error","Invalid Password")   
