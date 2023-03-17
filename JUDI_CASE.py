@@ -10,6 +10,7 @@ from tkinter import END
 import smtplib
 from email.mime.text import MIMEText
 
+
 class ttk_frame(ttk.Frame):
     def __init__(self,container):
         super().__init__(container)
@@ -77,9 +78,9 @@ class ttk_frame(ttk.Frame):
 
 #Create the class
 class Judiciary(tk.Tk):
-    def __init__(self):
+    def __init__(self,user_admin_normal):
         super().__init__()
-
+        self.user_admin_normal=user_admin_normal
         self.title('Judicial Case Monitoring Software')
         self.geometry('2000x800+0+0')
         self.configure(bg="#3A88AA")
@@ -225,17 +226,23 @@ class Judiciary(tk.Tk):
         
         self.update_button=tk.Button(self.ButtonFrame,text='Update',command=self.update_data, bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.update_button.grid(row=0,column=3,ipady=1)
-        
-        self.delete_button=tk.Button(self.ButtonFrame,text='Delete',command=self.delete_details ,bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
-        self.delete_button.grid(row=0,column=4,ipady=1)
+   
+        if self.user_admin_normal == "Admin":
+           self.delete_button=tk.Button(self.ButtonFrame,text='Delete',command=self.delete_details ,bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
+           self.delete_button.grid(row=0,column=4,ipady=1)
+        else:
+           self.delete_button=None 
 
+          
         self.clear_button=tk.Button(self.ButtonFrame,text='Clear',command=self.clear_details, bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.clear_button.grid(row=0,column=5,ipady=1)
-        
         
         self.exit_button=tk.Button(self.ButtonFrame,text='Exit',command=self.exit ,bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.exit_button.grid(row=0,column=6,ipady=1)
 
+        if self.delete_button is not None:
+           self.delete_button.grid(row=0,column=4,ipady=1)
+        
         # ==================================Scrollbar========================
         self.my_object.scrollbar(self.DetailsFrame,self.get_treedetails)
 
@@ -301,6 +308,11 @@ class Judiciary(tk.Tk):
         self.billing_string.set(row[6])
         self.hearingdate_string.set(row[7])
         self.nexthearing_string.set(row[8])
+        
+    #def delete_hide(self):
+        #self.hide_button()
+        
+        #self.delete_details()
 
     def search_query(self):
               db=mysql.connector.connect(
@@ -349,6 +361,7 @@ class Judiciary(tk.Tk):
 
     def update_data(self):
          #establish a connection
+                  
                     db=mysql.connector.connect(
                     host="localhost",
                     user="root",
@@ -434,6 +447,7 @@ class Judiciary(tk.Tk):
               
          finally:
               cursor.close()
+              self.my_object.fetch_data()
               db.close()
     def clear_details(self):
         casestatus=self.my_object.casestatus_string
@@ -496,7 +510,7 @@ class Judiciary(tk.Tk):
               self.destroy()
 
 if __name__ == "__main__":        
-    Jud=Judiciary()
+    Jud=Judiciary(user_admin_normal=False)
     ttk_frame(Jud)
     Jud.mainloop()
                     

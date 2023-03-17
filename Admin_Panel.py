@@ -7,6 +7,7 @@ from tkinter import END
 import smtplib
 from email.mime.text import MIMEText
 from JUDI_CASE import Judiciary,ttk_frame
+import re
 
 
 class ttk_window(ttk.Frame):
@@ -214,8 +215,8 @@ class Admin_Panel(tk.Tk):
 
         #===========Functionalities====================#
     def submit(self):
-             if self.password_string.get() != self.repeat_string.get():
-                  messagebox.showerror("Error","Passwords have to match")
+             if self.password_string.get() == " " and self.repeat_string.get() ==" ":
+                  messagebox.showerror("Error","All fields are required")
              else:
                    db=mysql.connector.connect(
                     host="localhost",
@@ -302,6 +303,27 @@ class Admin_Panel(tk.Tk):
          finally:
               cursor.close()
               db.close()
+
+    def password_regex(self):
+         password=self.password_string.get()
+         repeat=self.repeat_string.get()
+
+         if password== " " and repeat== " ":
+             return messagebox.showwarning("Warning","All fields are required")
+         #Check password strength
+         if not re.search(r'[A-Z]',password):
+              messagebox.showerror("Warning","Password must have at least one uppercase letter")
+              return
+         if not re.search(r'[a-z]',password):
+              messagebox.showerroe("Warning","Password must have at least one lowercase letter")
+              return
+         if not re.search(r'\d',password):
+              messagebox.showerroe("Warning","Password must have at least one number")
+              return
+         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+              messagebox.showerroe("Warning","Password must have at least one special character")
+              return
+    
     def update_function(self):
           db=mysql.connector.connect(
                     host="localhost",
@@ -355,6 +377,7 @@ class Admin_Panel(tk.Tk):
          self.txtprescription.insert(END,"Users' Role:\t" + self.radio_string.get() + "\n")
 
     def submit_and_function(self):
+         self.password_regex()
          self.submit()
          self.user_details()  
          self.send_email() 
@@ -437,7 +460,7 @@ class Admin_Panel(tk.Tk):
 
     def main_page(self):
          self.destroy()
-         Jud=Judiciary()
+         Jud=Judiciary(user_admin_normal="Admin")
          ttk_frame(Jud)
          Jud.mainloop()
             

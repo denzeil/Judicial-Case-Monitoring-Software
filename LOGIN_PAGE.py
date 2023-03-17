@@ -74,9 +74,9 @@ class login(tk.Tk):
                         self.destroy()
                         admin=Admin_Panel()
                         admin.mainloop() 
-                    else:    
+                    else: 
                         self.destroy()
-                        Jud=Judiciary()
+                        Jud=Judiciary("Normal")
                         ttk_frame(Jud)
                         Jud.mainloop()
             
