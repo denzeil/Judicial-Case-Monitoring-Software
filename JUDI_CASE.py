@@ -214,6 +214,15 @@ class Judiciary(tk.Tk):
         self.next_hearingentry=tk.Entry(self.DataFrameLeft,textvariable=self.nexthearing_string ,font=('arial bold',12),width=35)
         self.next_hearingentry.grid(row=5,column=3)
          
+        self.description=tk.Label(self.DataFrameLeft,text="Case Description",font=('arial bold',12),padx=2,pady=6)
+        self.description.grid(row=6,column=2,sticky='W')
+        self.text_description=tk.Text(self.DataFrameLeft,font=('arial bold',12))
+        self.text_description.grid(row=6, column=3,rowspan=5, sticky='W', padx=2, pady=6)
+        self.text_description.configure(width=35,height=6.6)
+        
+        
+
+        #self.text_description.rowconfigure(6,weight=5)
         #Dataframe right
         self.txtprescription=tk.Text(self.DataFrameRight,font=('arial bold',12),fg='white',bg='#3A88AA',padx=2,pady=6,width=36,height=17)
         self.txtprescription.grid(row=0,column=0)
@@ -264,16 +273,18 @@ class Judiciary(tk.Tk):
                     try:
                         casestatus=self.my_object.casestatus_string.get()
                         judgename=self.my_object.judgename_string.get()
+                        text=self.text_description.get("1.0","end-1c")
+                        
 
                         judge_tables="INSERT INTO judge_information(Judge_ID,Judge_name,Judge_email,Judge_contact) VALUES (%s,%s,%s,%s)"
                         judge_values=(self.judge_stringid.get(),judgename,self.judgeemail_string.get(),self.judgecontact_string.get())
                         cursor.execute(judge_tables,judge_values)
 
 
-                        sql_tables="INSERT INTO client_information(Case_ID,Client_name,Client_Contact,Case_type,Case_status, Appearances, Billing_ksh, Judge_ID, Hearing_date, Next_hearing, Laywer_name, Laywer_contact,Date_filed) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                        sql_tables="INSERT INTO client_information(Case_ID,Client_name,Client_Contact,Case_type,Case_status, Appearances, Billing_ksh, Judge_ID, Hearing_date, Next_hearing, Laywer_name, Laywer_contact,Date_filed,case_description) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
                         client_values=(self.caseid_string.get(),self.clientname_string.get(),self.clientcontact_string.get(),self.casetype_string.get(), casestatus ,self.appearances_string.get(),self.billing_string.get()
                                       ,self.judge_stringid.get(),self.hearingdate_string.get(),self.nexthearing_string.get() ,
-                                      self.lawyername_string.get(), self.lawyercontact_string.get(),self.datefiled_string.get())
+                                      self.lawyername_string.get(), self.lawyercontact_string.get(),self.datefiled_string.get(),text)
                         cursor.execute(sql_tables,client_values)
                         
                         #Insert into judge information
@@ -326,7 +337,7 @@ class Judiciary(tk.Tk):
               try:
                  mycursor=db.cursor() 
                  search=self.search_string.get()
-                 query="SELECT client_information.Case_ID, client_information.Client_name, client_information.Client_contact, client_information.Case_type, client_information.Case_status, client_information.Appearances, client_information.Billing_ksh, judge_information.Judge_ID, client_information.Hearing_date, client_information.Next_hearing, client_information.Laywer_name, client_information.Laywer_contact, client_information.Date_filed, judge_information.Judge_name, judge_information.Judge_email, judge_information.Judge_contact FROM client_information INNER JOIN judge_information ON client_information.Judge_ID = judge_information.Judge_ID WHERE client_information.Case_ID= %s"
+                 query="SELECT client_information.Case_ID, client_information.Client_name, client_information.Client_contact, client_information.Case_type, client_information.Case_status, client_information.Appearances, client_information.Billing_ksh, judge_information.Judge_ID, client_information.Hearing_date, client_information.Next_hearing, client_information.Laywer_name, client_information.Laywer_contact, client_information.Date_filed,client_information.case_description, judge_information.Judge_name, judge_information.Judge_email, judge_information.Judge_contact FROM client_information INNER JOIN judge_information ON client_information.Judge_ID = judge_information.Judge_ID WHERE client_information.Case_ID= %s"
                  mycursor.execute(query,(search,))
                  result=mycursor.fetchone()
 
@@ -335,6 +346,7 @@ class Judiciary(tk.Tk):
                  else:
                     casestatus=self.my_object.casestatus_string
                     judgename=self.my_object.judgename_string
+                    text=self.text_description.get("1.0","end-1c")
                     self.caseid_string.set(result[0])
                     self.clientname_string.set(result[1])
                     self.clientcontact_string.set(result[2])
@@ -348,9 +360,12 @@ class Judiciary(tk.Tk):
                     self.lawyername_string.set(result[10])
                     self.lawyercontact_string.set(result[11])
                     self.datefiled_string.set(result[12])
-                    judgename.set(result[13])
-                    self.judgeemail_string.set(result[14])
-                    self.judgecontact_string.set(result[15])
+                    self.text_description.delete('1.0', tk.END) 
+                    self.text_description.insert(tk.END,result[13])
+                    judgename.set(result[14])
+                    self.judgeemail_string.set(result[15])
+                    self.judgecontact_string.set(result[16])
+                   
                   
               except mysql.connector.Error as error:
                         messagebox.showerror("Error",str(error))
@@ -376,6 +391,7 @@ class Judiciary(tk.Tk):
                     try:
                         casestatus=self.my_object.casestatus_string.get()
                         judgename=self.my_object.judgename_string.get()
+                        text=self.text_description.get("1.0","end-1c")
 
                         #update the judge_query
                         judge_tables="UPDATE judge_information SET Judge_name=%s,Judge_email=%s,Judge_contact=%s WHERE Judge_ID=%s "
@@ -383,10 +399,10 @@ class Judiciary(tk.Tk):
                         cursor.execute(judge_tables,judge_values)
 
 
-                        sql_tables="UPDATE client_information SET Case_ID=%s, Client_name=%s ,Client_Contact=%s ,Case_type=%s, Case_status=%s, Appearances=%s, Billing_ksh=%s, Hearing_date=%s, Next_hearing=%s, Laywer_name=%s, Laywer_contact=%s,Date_filed=%s WHERE Judge_ID=%s"
+                        sql_tables="UPDATE client_information SET Case_ID=%s, Client_name=%s ,Client_Contact=%s ,Case_type=%s, Case_status=%s, Appearances=%s, Billing_ksh=%s, Hearing_date=%s, Next_hearing=%s, Laywer_name=%s, Laywer_contact=%s,Date_filed=%s,case_description=%s WHERE Judge_ID=%s"
                         client_values=(self.caseid_string.get(),self.clientname_string.get(),self.clientcontact_string.get(),self.casetype_string.get(), casestatus ,self.appearances_string.get(),self.billing_string.get()
                                       ,self.hearingdate_string.get(),self.nexthearing_string.get() ,
-                                      self.lawyername_string.get(), self.lawyercontact_string.get(),self.datefiled_string.get(),self.judge_stringid.get())
+                                      self.lawyername_string.get(), self.lawyercontact_string.get(),self.datefiled_string.get(),text,self.judge_stringid.get())
                         cursor.execute(sql_tables,client_values)
                         
                         #Insert into judge information
@@ -407,20 +423,22 @@ class Judiciary(tk.Tk):
     def case_details(self):
          casestatus=self.my_object.casestatus_string.get()
          judgename=self.my_object.judgename_string.get()
-         self.txtprescription.insert(END,"Case ID:\t\t\t" + self.caseid_string.get() + "\n")
-         self.txtprescription.insert(END,"Client's name:\t\t\t" + self.clientname_string.get() + "\n")
-         self.txtprescription.insert(END,"Client's contact:\t\t\t" + self.clientcontact_string.get() + "\n")
-         self.txtprescription.insert(END,"Lawyer's name:\t\t\t" + self.lawyercontact_string.get() + "\n")
-         self.txtprescription.insert(END,"Lawyer's Contact:\t\t\t" + self.lawyercontact_string.get() + "\n")
-         self.txtprescription.insert(END,"Date Filed:\t\t\t" + self.datefiled_string.get() + "\n")
-         self.txtprescription.insert(END,"Case Status:\t\t\t" + casestatus + "\n")
-         self.txtprescription.insert(END,"Court Appearances:\t\t\t" + self.appearances_string.get() + "\n")
-         self.txtprescription.insert(END,"Judge's name:\t\t\t" + judgename + "\n")
-         self.txtprescription.insert(END,"Judge's email:\t\t\t" + self.judgeemail_string.get() + "\n")
-         self.txtprescription.insert(END,"Judge's Contact:\t\t\t" + self.judgecontact_string.get() + "\n")
-         self.txtprescription.insert(END,"Judge ID:\t\t\t" + self.judge_stringid.get() + "\n")
-         self.txtprescription.insert(END,"Hearing Date:\t\t\t" + self.hearingdate_string.get() + "\n")
-         self.txtprescription.insert(END,"Next Hearing:\t\t\t" + self.nexthearing_string.get() + "\n")
+         text=self.text_description.get("1.0","end-1c")
+         self.txtprescription.insert(END,"Case ID:\t\t" + self.caseid_string.get() + "\n")
+         self.txtprescription.insert(END,"Client's name:\t\t" + self.clientname_string.get() + "\n")
+         self.txtprescription.insert(END,"Client's contact:\t\t" + self.clientcontact_string.get() + "\n")
+         self.txtprescription.insert(END,"Lawyer's name:\t\t" + self.lawyercontact_string.get() + "\n")
+         self.txtprescription.insert(END,"Lawyer's Contact:\t\t" + self.lawyercontact_string.get() + "\n")
+         self.txtprescription.insert(END,"Date Filed:\t\t" + self.datefiled_string.get() + "\n")
+         self.txtprescription.insert(END,"Case Status:\t\t" + casestatus + "\n")
+         self.txtprescription.insert(END,"Court Appearances:\t\t" + self.appearances_string.get() + "\n")
+         self.txtprescription.insert(END,"Judge's name:\t\t" + judgename + "\n")
+         self.txtprescription.insert(END,"Judge's email:\t\t" + self.judgeemail_string.get() + "\n")
+         self.txtprescription.insert(END,"Judge's Contact:\t\t" + self.judgecontact_string.get() + "\n")
+         self.txtprescription.insert(END,"Judge ID:\t\t" + self.judge_stringid.get() + "\n")
+         self.txtprescription.insert(END,"Hearing Date:\t\t" + self.hearingdate_string.get() + "\n")
+         self.txtprescription.insert(END,"Next Hearing:\t\t" + self.nexthearing_string.get() + "\n")
+         self.txtprescription.insert(END,"Case Description:\t\t" + text + "\n")
     
     def print_out(self):
          self.submit()
@@ -454,6 +472,7 @@ class Judiciary(tk.Tk):
     def clear_details(self):
         casestatus=self.my_object.casestatus_string
         judgename=self.my_object.judgename_string
+        
         self.caseid_string.set(" ")
         self.clientname_string.set(" ")
         self.clientcontact_string.set(" ")
@@ -470,6 +489,8 @@ class Judiciary(tk.Tk):
         judgename.set(" ")
         self.judgeemail_string.set(" ")
         self.judgecontact_string.set(" ")
+        self.text_description.delete('1.0','end')
+        
         
     def send_email(self):
          judge_name=self.my_object.judgename_string.get()
@@ -481,8 +502,9 @@ class Judiciary(tk.Tk):
          nexthearing=self.nexthearing_string.get()
          #client_name=self.clientname_string.get()
          case_id=self.caseid_string.get()
+         text=self.text_description.get("1.0","end-1c")
 
-         msg=MIMEText(F"Hello {judge_name},I hope your doing well. On {hearingdate}, you will be required in Court for a hearing, the Case ID is {case_id} and the type of case:{case_type}. The lawyer in charge of the case is {lawyer_name}. The case is {case_status}, your next hearing will be on {nexthearing}.\n Have a nice day.")
+         msg=MIMEText(F"Hello {judge_name},I hope your doing well. On {hearingdate}, you will be required in Court for a hearing, the Case ID is {case_id} and the type of case:{case_type}. The lawyer in charge of the case is {lawyer_name}. The case is {case_status}.Case Description: {text}\nyour next hearing will be on {nexthearing}.\n Have a nice day.")
          msg['From']='calebdenzeil@gmail.com'
          msg['To']=judge_email
          msg['Subject']='Case Details'
