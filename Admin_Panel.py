@@ -436,7 +436,7 @@ class Admin_Panel(tk.Tk):
 
          
          msg=MIMEText(F"Hello {first} {second}, your username and password are: {user} {password}")
-         msg['From']='calebdenzeil@gmail.com'
+         msg['From']='denzeilshiks@gmail.com'
          msg['To']=email
          msg['Subject']='Log in details'
 
@@ -444,8 +444,8 @@ class Admin_Panel(tk.Tk):
          try: 
                 smtp_server = 'smtp.gmail.com'
                 smtp_port = 587
-                smtp_username = 'calebdenzeil@gmail.com'
-                smtp_password = 'lxxwhddjbziaqeuz'
+                smtp_username = 'denzeilshiks@gmail.com'
+                smtp_password = 'xuqbdqdfcmjsukgc'
                 smtp_session = smtplib.SMTP(smtp_server, smtp_port)
                 smtp_session.starttls()
                 smtp_session.login(smtp_username, smtp_password)
