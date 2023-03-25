@@ -505,7 +505,7 @@ class Judiciary(tk.Tk):
          text=self.text_description.get("1.0","end-1c")
 
          msg=MIMEText(F"Hello {judge_name},I hope your doing well. On {hearingdate}, you will be required in Court for a hearing, the Case ID is {case_id} and the type of case:{case_type}. The lawyer in charge of the case is {lawyer_name}. The case is {case_status}.Case Description: {text}\nyour next hearing will be on {nexthearing}.\n Have a nice day.")
-         msg['From']='denzeilshiks@gmail.com'
+         msg['From']='shiksdenzeil@gmail.com'
          msg['To']=judge_email
          msg['Subject']='Case Details'
 
@@ -513,8 +513,8 @@ class Judiciary(tk.Tk):
          try: 
                 smtp_server = 'smtp.gmail.com'
                 smtp_port = 587
-                smtp_username = 'denzeilshiks@gmail.com'
-                smtp_password = 'xuqbdqdfcmjsukgc'
+                smtp_username = 'shiksdenzeil@gmail.com'
+                smtp_password = 'cfpqlsejixamrlwa'
                 smtp_session = smtplib.SMTP(smtp_server, smtp_port)
                 smtp_session.starttls()
                 smtp_session.login(smtp_username, smtp_password)
