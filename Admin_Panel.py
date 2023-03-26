@@ -8,7 +8,7 @@ import smtplib
 from email.mime.text import MIMEText
 from JUDI_CASE import Judiciary,ttk_frame
 import re
-
+from cryptography.fernet import Fernet
 
 class ttk_window(ttk.Frame):
     def __init__(self,container):
@@ -228,18 +228,25 @@ class Admin_Panel(tk.Tk):
 
                    try:
                         user=self.my_user.usertype.get()
-                        sql_query="INSERT INTO admin_information(First_name,Second_name,Work_ID,User_type,Email,Contact,Pass_word,Password_repeat,Username, Date_created,Roles ) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+                        key=Fernet.generate_key()
+                        fernet=Fernet(key)
+                        data=self.password_string.get().encode('utf-8')
+                        encrypted_data=fernet.encrypt(data)
+                        data_2=self.repeat_string.get().encode('utf-8')
+                        encrypted_data_two=fernet.encrypt(data_2)
+                        sql_query="INSERT INTO admin_information(First_name,Second_name,Work_ID,User_type,Email,Contact,Pass_word,Password_repeat,Username, Date_created,Roles,Crypto_keys ) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
                         values=(self.first.get()
                              ,self.second.get()
                              ,self.work.get()
                              ,user
                              ,self.email_string.get()
                              ,self.contact_string.get()
-                             ,self.password_string.get()
-                             ,self.repeat_string.get()
+                             ,encrypted_data
+                             ,encrypted_data_two
                              ,self.username_string.get()
                              ,self.datecreated_string.get()
-                             ,self.radio_string.get())
+                             ,self.radio_string.get(),
+                             key)
                         cursor.execute(sql_query,values)
                         db.commit()
                         messagebox.showinfo("Success","Details submitted sucessfully")
@@ -335,14 +342,12 @@ class Admin_Panel(tk.Tk):
           try:
      
               user=self.my_user.usertype.get()
-              sql_query="UPDATE admin_information SET First_name=%s,Second_name=%s, User_type=%s,Email=%s,Contact=%s,Pass_word=%s,Password_repeat=%s,Username=%s, Date_created=%s, Roles=%s WHERE Work_ID=%s "
+              sql_query="UPDATE admin_information SET First_name=%s,Second_name=%s, User_type=%s,Email=%s,Contact=%s,Username=%s, Date_created=%s, Roles=%s WHERE Work_ID=%s "
               values=(        self.first.get()
                              ,self.second.get()
                              ,user
                              ,self.email_string.get()
                              ,self.contact_string.get()
-                             ,self.password_string.get()
-                             ,self.repeat_string.get()
                              ,self.username_string.get()
                              ,self.datecreated_string.get()
                              ,self.radio_string.get()
@@ -380,7 +385,7 @@ class Admin_Panel(tk.Tk):
          self.password_regex()
          self.submit()
          self.user_details()  
-         self.send_email() 
+         #self.send_email() 
 
     def delete_function(self):
           db=mysql.connector.connect(
@@ -443,9 +448,9 @@ class Admin_Panel(tk.Tk):
          #create smtp
          try: 
                 smtp_server = 'smtp.gmail.com'
-                smtp_port = 587
+                smtp_port = 465
                 smtp_username = 'shiksdenzeil@gmail.com'
-                smtp_password = 'cfpqlsejixamrlwa'
+                smtp_password = 'prtrudinlebhhdhe'
                 smtp_session = smtplib.SMTP(smtp_server, smtp_port)
                 smtp_session.starttls()
                 smtp_session.login(smtp_username, smtp_password)

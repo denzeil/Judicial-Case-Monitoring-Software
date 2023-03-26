@@ -3,9 +3,9 @@ from tkinter import ttk
 from PIL import ImageTk,Image
 from tkinter import messagebox
 import mysql.connector
-import bcrypt
 from JUDI_CASE import Judiciary,ttk_frame
 from Admin_Panel import ttk_window,Admin_Panel
+from cryptography.fernet import Fernet
 
 class login(tk.Tk):
     def __init__(self):
@@ -60,27 +60,29 @@ class login(tk.Tk):
                 database="Judiciary")
             cursor=db.cursor()
             username=self.username.get()
-            salt=bcrypt.gensalt()
-            password=self.password.get().encode('utf-8')
+            login_password=self.password.get()
+            
             try:
-                cursor.execute("SELECT Pass_word, Roles FROM admin_information WHERE Username=%s",(username,))
+                cursor.execute("SELECT Pass_word, Roles,Crypto_keys FROM admin_information WHERE Username=%s",(username,))
                 result=cursor.fetchone()
                 if result:
-                  hashed_password=result[0]
-                  hashed_password=bcrypt.hashpw(hashed_password.encode('utf-8'),salt)
-                  if bcrypt.checkpw(password,hashed_password):
-                    messagebox.showinfo("Success","Log in succesful")
-                    if result[1] == "Admin":
+                   key=result[2]
+                   d_password=result[0]
+                   dice=Fernet(key)
+                   decrypt_pass=dice.decrypt(d_password.encode()).decode()
+                   if login_password == decrypt_pass:
+                      messagebox.showinfo("Success","Log in succesful")
+                      if result[1] == "Admin":
                         self.destroy()
                         admin=Admin_Panel()
                         admin.mainloop() 
-                    else: 
+                      else: 
                         self.destroy()
                         Jud=Judiciary("Normal")
                         ttk_frame(Jud)
                         Jud.mainloop()
             
-                  else:
+                   else:
                         messagebox.showerror("Error","Invalid Password")   
 
                 else:
