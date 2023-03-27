@@ -81,7 +81,7 @@ class Judiciary(tk.Tk):
     def __init__(self,user_admin_normal):
         super().__init__()
         self.user_admin_normal=user_admin_normal
-        self.title('Judicial Case Monitoring Software')
+        self.title('Judicial Case Monitoring System')
         self.geometry('2000x800+0+0')
         self.configure(bg="#3A88AA")
         
@@ -101,7 +101,7 @@ class Judiciary(tk.Tk):
         self.judge_stringid=tk.StringVar()
         self.search_string=tk.StringVar()
        
-        self.label1=tk.Label(self,bd=13,relief="ridge",text="JUDICIAL CASE MONITORING SOFTWARE",fg="blue",bg="white",font=("times new roman bold",38))
+        self.label1=tk.Label(self,bd=13,relief="ridge",text="JUDICIAL CASE MONITORING SYSTEM",fg="blue",bg="white",font=("times new roman bold",38))
         self.label1.pack(side="top",fill="x")
     
         #Create 
@@ -512,7 +512,7 @@ class Judiciary(tk.Tk):
          #create smtp
          try: 
                 smtp_server = 'smtp.gmail.com'
-                smtp_port = 465
+                smtp_port = 587
                 smtp_username = 'shiksdenzeil@gmail.com'
                 smtp_password = 'prtrudinlebhhdhe'
                 smtp_session = smtplib.SMTP(smtp_server, smtp_port)

@@ -385,7 +385,7 @@ class Admin_Panel(tk.Tk):
          self.password_regex()
          self.submit()
          self.user_details()  
-         #self.send_email() 
+         self.send_email() 
 
     def delete_function(self):
           db=mysql.connector.connect(
@@ -448,7 +448,7 @@ class Admin_Panel(tk.Tk):
          #create smtp
          try: 
                 smtp_server = 'smtp.gmail.com'
-                smtp_port = 465
+                smtp_port = 587
                 smtp_username = 'shiksdenzeil@gmail.com'
                 smtp_password = 'prtrudinlebhhdhe'
                 smtp_session = smtplib.SMTP(smtp_server, smtp_port)
