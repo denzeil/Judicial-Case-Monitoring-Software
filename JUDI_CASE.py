@@ -219,8 +219,6 @@ class Judiciary(tk.Tk):
         self.text_description.grid(row=6, column=3,rowspan=5, sticky='W', padx=2, pady=6)
         self.text_description.configure(width=35,height=6.6)
         
-        
-
         #self.text_description.rowconfigure(6,weight=5)
         #Dataframe right
         self.txtprescription=tk.Text(self.DataFrameRight,font=('arial bold',12),fg='white',bg='#3A88AA',padx=2,pady=6,width=36,height=17)
