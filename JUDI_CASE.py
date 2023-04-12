@@ -238,7 +238,6 @@ class Judiciary(tk.Tk):
         else:
            self.delete_button=None 
 
-          
         self.clear_button=tk.Button(self.ButtonFrame,text='Clear',command=self.clear_details, bg='#B4123D',fg='white',width=22,pady=6,padx=2,font=('arial bold',12))
         self.clear_button.grid(row=0,column=5,ipady=1)
         
