@@ -18,6 +18,7 @@ title_name=soup.select_one(selector='span a')
 
 article_upvote=soup.find(name='span',class_='score')
 
+
 article_link=soup.find(name='a',class_='storylink')
 #print(heading.getText())
 #print(article_link)
