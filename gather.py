@@ -22,6 +22,7 @@ article_upvote=soup.find(name='span',class_='score')
 article_link=soup.find(name='a',class_='storylink')
 #print(heading.getText())
 #print(article_link)
+
 article_text=[]
 article_vote=[]
 
