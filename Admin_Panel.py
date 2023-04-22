@@ -439,7 +439,6 @@ class Admin_Panel(tk.Tk):
          user=self.username_string.get() 
          email=self.email_string.get()  
 
-         
          msg=MIMEText(F"Hello {first} {second}, your username and password are: {user} {password}")
          msg['From']='ryanmali097@gmail.com'
          msg['To']=email
