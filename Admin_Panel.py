@@ -443,7 +443,6 @@ class Admin_Panel(tk.Tk):
          msg['From']='ryanmali097@gmail.com'
          msg['To']=email
          msg['Subject']='Log in details'
-
          #create smtp
          try: 
                 smtp_server = 'smtp.gmail.com'
