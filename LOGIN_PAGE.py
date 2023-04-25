@@ -93,7 +93,6 @@ class login(tk.Tk):
                 cursor.close()
                 db.close()  
                       
-
 if __name__ =="__main__":
     log=login()
     log.mainloop()        
