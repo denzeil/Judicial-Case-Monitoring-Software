@@ -264,7 +264,6 @@ class Judiciary(tk.Tk):
                      )    
                 #create a cursor
                     cursor=db.cursor()
-            
                     try:
                         casestatus=self.my_object.casestatus_string.get()
                         judgename=self.my_object.judgename_string.get()
