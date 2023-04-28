@@ -269,7 +269,6 @@ class Judiciary(tk.Tk):
                         judgename=self.my_object.judgename_string.get()
                         text=self.text_description.get("1.0","end-1c")
                         
-
                         judge_tables="INSERT INTO judge_information(Judge_ID,Judge_name,Judge_email,Judge_contact) VALUES (%s,%s,%s,%s)"
                         judge_values=(self.judge_stringid.get(),judgename,self.judgeemail_string.get(),self.judgecontact_string.get())
                         cursor.execute(judge_tables,judge_values)
