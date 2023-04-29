@@ -273,7 +273,6 @@ class Judiciary(tk.Tk):
                         judge_values=(self.judge_stringid.get(),judgename,self.judgeemail_string.get(),self.judgecontact_string.get())
                         cursor.execute(judge_tables,judge_values)
 
-
                         sql_tables="INSERT INTO client_information(Case_ID,Client_name,Client_Contact,Case_type,Case_status, Appearances, Billing_ksh, Judge_ID, Hearing_date, Next_hearing, Laywer_name, Laywer_contact,Date_filed,case_description) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
                         client_values=(self.caseid_string.get(),self.clientname_string.get(),self.clientcontact_string.get(),self.casetype_string.get(), casestatus ,self.appearances_string.get(),self.billing_string.get()
                                       ,self.judge_stringid.get(),self.hearingdate_string.get(),self.nexthearing_string.get() ,
