@@ -317,7 +317,6 @@ class Judiciary(tk.Tk):
     #def delete_hide(self):
         #self.hide_button()
         
-        #self.delete_details()
 
     def search_query(self):
               db=mysql.connector.connect(
