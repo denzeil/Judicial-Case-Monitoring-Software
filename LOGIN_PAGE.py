@@ -96,4 +96,3 @@ class login(tk.Tk):
 if __name__ =="__main__":
     log=login()
     log.mainloop()        
-
