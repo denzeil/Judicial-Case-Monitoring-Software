@@ -24,6 +24,5 @@ article_link=soup.find(name='a',class_='storylink')
 
 article_text=[]
 article_vote=[]
-
 print(article_link)
 
